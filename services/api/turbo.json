@@ -1,0 +1,9 @@
+{
+    "extends": ["//"],
+    "tasks": {
+      "build": {
+        "env": ["PORT", "PINO_LOG_LEVEL"],
+        "outputs": ["dist/**"]
+      }
+    }
+  }

@@ -1,7 +1,8 @@
-import js from "@eslint/js";
-import eslintConfigPrettier from "eslint-config-prettier";
-import turboPlugin from "eslint-plugin-turbo";
-import onlyWarn from "eslint-plugin-only-warn";
+import js from "@eslint/js"
+import nodePlugin from "eslint-plugin-n"
+import eslintConfigPrettier from "eslint-config-prettier"
+import turboPlugin from "eslint-plugin-turbo"
+import onlyWarn from "eslint-plugin-only-warn"
 
 /**
  * A shared ESLint configuration for the repository.
@@ -10,7 +11,18 @@ import onlyWarn from "eslint-plugin-only-warn";
  * */
 export const config = [
     js.configs.recommended,
+    nodePlugin.configs["flat/recommended-module"],
     eslintConfigPrettier,
+    {
+        rules: {
+            "n/no-unpublished-import": [
+                "error",
+                {
+                    ignorePrivate: true,
+                },
+            ],
+        },
+    },
     {
         plugins: {
             turbo: turboPlugin,
@@ -27,4 +39,4 @@ export const config = [
     {
         ignores: ["dist/**"],
     },
-];
+]
