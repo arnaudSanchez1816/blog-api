@@ -8,7 +8,12 @@
   "scripts": {
     "dev": "node --watch ./src/index.js | pnpx pino-pretty",
     "lint": "eslint ./src",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prisma:migrate": "pnpx prisma migrate dev",
+    "prisma:push": "pnpx prisma db push",
+    "prisma:reset": "pnpx prisma migrate reset",
+    "prisma:generate": "pnpx prisma generate --sql",
+    "prisma:deploy": "pnpx prisma migrate deploy"
   },
   "keywords": [],
   "author": "",
