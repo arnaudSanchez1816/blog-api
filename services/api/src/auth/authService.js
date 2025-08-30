@@ -13,7 +13,7 @@ export const generateAccessToken = async (
             },
             process.env.JWT_SECRET,
             {
-                expiresIn: "1 day",
+                expiresIn,
             },
             (error, encodedToken) => {
                 if (error) {
