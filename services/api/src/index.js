@@ -1,6 +1,5 @@
 import app from "./app.js"
-import pinoMake from "pino"
-const pino = pinoMake({ level: process.env.PINO_LOG_LEVEL || "info" })
+import { pino } from "./config/pino.js"
 
 // Start server
 const port = process.env.PORT || "3000"
