@@ -96,7 +96,10 @@ export const deletePost = async (postId) => {
     return deletedPost
 }
 
-export const getPostDetails = async (postId) => {
+export const getPostDetails = async (
+    postId,
+    { includeComments = false } = {}
+) => {
     const post = await prisma.post.findUnique({
         where: {
             id: postId,
@@ -109,10 +112,23 @@ export const getPostDetails = async (postId) => {
                     name: true,
                 },
             },
+            ...(includeComments && {
+                comments: true,
+            }),
         },
     })
 
     return post
+}
+
+export const userCanViewPost = (post, userId) => {
+    if (!post.publishedAt) {
+        if (!userId || post.authorId !== userId) {
+            return false
+        }
+    }
+
+    return true
 }
 
 export * as default from "./postsService.js"

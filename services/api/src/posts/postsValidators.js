@@ -40,3 +40,9 @@ export const getPublishedPostValidator = z.object({
         id: postIdSchema,
     }),
 })
+
+export const getPostCommentsValidator = z.object({
+    params: z.object({
+        id: postIdSchema,
+    }),
+})

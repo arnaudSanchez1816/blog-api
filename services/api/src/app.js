@@ -8,6 +8,7 @@ import signupRouter from "./signup/signupRouter.js"
 import authRouter from "./auth/authRouter.js"
 import postsRouter from "./posts/postsRouter.js"
 import usersRouter from "./users/usersRouter.js"
+import commentsRouter from "./comments/commentsRouter.js"
 import passport from "./config/passport.js"
 import { pino } from "./config/pino.js"
 import { ZodError } from "zod"
@@ -28,6 +29,7 @@ v1Router.use("/signup", signupRouter)
 v1Router.use("/auth", authRouter)
 v1Router.use("/posts", postsRouter)
 v1Router.use("/users", usersRouter)
+v1Router.use("/comments", commentsRouter)
 app.use("/api/v1", v1Router)
 
 // 404 error

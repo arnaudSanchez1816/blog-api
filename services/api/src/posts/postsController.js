@@ -1,11 +1,13 @@
 import {
     createPostValidator,
     deletePostValidator,
+    getPostCommentsValidator,
     getPublishedPostsValidator,
     getPublishedPostValidator,
     updatePostValidator,
 } from "./postsValidators.js"
-import postsService from "./postsService.js"
+import postsService, { userCanViewPost } from "./postsService.js"
+import commentsService from "../comments/commentsService.js"
 import { validateRequest } from "../middlewares/validator.js"
 import createHttpError from "http-errors"
 
@@ -20,10 +22,8 @@ export const getPost = [
             if (!post) {
                 throw new createHttpError.NotFound()
             }
-            if (!post.publishedAt) {
-                if (!userId || post.authorId !== userId) {
-                    throw new createHttpError.Forbidden()
-                }
+            if (!userCanViewPost(post, userId)) {
+                throw new createHttpError.Forbidden()
             }
             return res.json(post)
         } catch (error) {
@@ -126,6 +126,65 @@ export const deletePost = [
             await postsService.deletePost(postId)
 
             return res.status(204).send()
+        } catch (error) {
+            next(error)
+        }
+    },
+]
+
+export const getPostComments = [
+    validateRequest(getPostCommentsValidator),
+    async (req, res, next) => {
+        try {
+            const { id: postId } = req.params
+            const { id: userId } = req.user
+            const post = await postsService.getPostDetails(postId)
+            if (!post) {
+                throw new createHttpError.NotFound()
+            }
+
+            if (!userCanViewPost(post, userId)) {
+                throw new createHttpError.Forbidden()
+            }
+
+            const { comments } = post
+
+            return res.json({
+                metadata: {
+                    count: comments.length,
+                },
+                results: comments,
+            })
+        } catch (error) {
+            next(error)
+        }
+    },
+]
+
+export const createPostComment = [
+    validateRequest(null),
+    async (req, res, next) => {
+        try {
+            const { id: postId } = req.params
+            const { username, body } = req.body
+            const { id: userId } = req.user
+
+            const post = await postsService.getPostDetails(postId)
+            if (!post) {
+                throw new createHttpError.NotFound()
+            }
+
+            if (!userCanViewPost(post, userId)) {
+                throw new createHttpError.Forbidden()
+            }
+
+            const comment = await commentsService.createComment({
+                postId,
+                body,
+                username,
+            })
+
+            return res.status(201).json(comment)
         } catch (error) {
             next(error)
         }
