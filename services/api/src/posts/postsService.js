@@ -75,7 +75,13 @@ export const getPostDetails = async (postId) => {
             id: postId,
         },
         include: {
-            author: true,
+            author: {
+                select: {
+                    id: true,
+                    email: true,
+                    name: true,
+                },
+            },
         },
     })
 

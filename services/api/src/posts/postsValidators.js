@@ -1,6 +1,8 @@
 import { SortByValues } from "./postsService.js"
 import { z } from "zod"
 
+const postIdSchema = z.coerce.number().int().min(1)
+
 export const getPublishedPostsValidator = z.object({
     query: z.object({
         sortBy: z
@@ -23,12 +25,18 @@ export const updatePostValidator = z.object({
         body: z.string(),
     }),
     params: z.object({
-        id: z.coerce.number().int().min(),
+        id: postIdSchema,
     }),
 })
 
 export const deletePostValidator = z.object({
     params: z.object({
-        id: z.coerce.number().int().min(),
+        id: postIdSchema,
+    }),
+})
+
+export const getPublishedPostValidator = z.object({
+    params: z.object({
+        id: postIdSchema,
     }),
 })

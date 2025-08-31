@@ -1,4 +1,5 @@
 import { ZodError, ZodAny } from "zod"
+import _ from "lodash"
 
 /**
  *
@@ -7,11 +8,14 @@ import { ZodError, ZodAny } from "zod"
  */
 export const validateRequest = (validator) => async (req, res, next) => {
     try {
-        await validator.parseAsync({
+        const data = await validator.parseAsync({
             body: req.body,
             params: req.params,
             query: req.query,
         })
+        _.merge(req.params, data.params)
+        _.merge(req.body, data.body)
+        _.merge(req.query, data.query)
 
         return next()
     } catch (error) {

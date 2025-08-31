@@ -2,11 +2,35 @@ import {
     createPostValidator,
     deletePostValidator,
     getPublishedPostsValidator,
+    getPublishedPostValidator,
     updatePostValidator,
 } from "./postsValidators.js"
 import postsService from "./postsService.js"
 import { validateRequest } from "../middlewares/validator.js"
 import createHttpError from "http-errors"
+
+export const getPublishedPost = [
+    validateRequest(getPublishedPostValidator),
+    async (req, res, next) => {
+        try {
+            const { id } = req.params
+            const { id: userId } = req.user
+
+            const post = await postsService.getPostDetails(id)
+            if (!post) {
+                throw new createHttpError.NotFound()
+            }
+            if (!post.publishedAt) {
+                if (!userId || post.authorId !== userId) {
+                    throw new createHttpError.Forbidden()
+                }
+            }
+            return res.json(post)
+        } catch (error) {
+            next(error)
+        }
+    },
+]
 
 export const getPublishedPosts = [
     validateRequest(getPublishedPostsValidator),
@@ -34,6 +58,8 @@ export const getPublishedPosts = [
         }
     },
 ]
+
+export const getUserPosts = [async (req, res, next) => {}]
 
 export const createPost = [
     validateRequest(createPostValidator),
@@ -68,13 +94,13 @@ export const updatePost = [
                 throw new createHttpError.Forbidden()
             }
 
-            const updatedPost = await postsService.updatePost({
+            await postsService.updatePost({
                 postId,
                 title,
                 body,
             })
 
-            return res.status(200).json(updatedPost)
+            return res.status(204).send()
         } catch (error) {
             next(error)
         }
@@ -97,9 +123,9 @@ export const deletePost = [
                 throw new createHttpError.Forbidden()
             }
 
-            const deletedPost = await postsService.deletePost(postId)
+            await postsService.deletePost(postId)
 
-            return res.status(200).json(deletedPost)
+            return res.status(204).send()
         } catch (error) {
             next(error)
         }
