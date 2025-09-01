@@ -14,7 +14,9 @@ export const signup = [
                 password,
             })
 
-            return res.status(201).json({ newUser })
+            const { userPassword, ...userDetails } = newUser
+
+            return res.status(201).json(userDetails)
         } catch (error) {
             next(error)
         }

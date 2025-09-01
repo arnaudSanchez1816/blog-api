@@ -25,7 +25,9 @@ app.use(cookieParser())
 app.use(passport.initialize())
 
 const v1Router = express.Router()
-v1Router.use("/signup", signupRouter)
+// Not useful right now
+// Regular user can't create posts and unsigned users can already create comments
+//v1Router.use("/signup", signupRouter)
 v1Router.use("/auth", authRouter)
 v1Router.use("/posts", postsRouter)
 v1Router.use("/users", usersRouter)
