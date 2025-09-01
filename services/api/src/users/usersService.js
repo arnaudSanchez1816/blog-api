@@ -24,7 +24,7 @@ export const getUserById = async (id) => {
 export const createUser = async ({ email, name, password }) => {
     const hashedPassword = await bcrypt.hash(
         password,
-        process.env.PASSWORD_SALT_LENGTH
+        +process.env.PASSWORD_SALT_LENGTH
     )
 
     const createdUser = await prisma.user.create({
