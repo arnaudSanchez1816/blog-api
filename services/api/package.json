@@ -13,7 +13,7 @@
     "prisma:seed": "pnpx prisma db seed",
     "prisma:push": "pnpx prisma db push",
     "prisma:reset": "pnpx prisma migrate reset",
-    "prisma:generate": "pnpx prisma generate --sql",
+    "prisma:generate": "pnpx prisma generate",
     "prisma:deploy": "pnpx prisma migrate deploy"
   },
   "prisma" : {
