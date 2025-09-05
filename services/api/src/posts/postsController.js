@@ -1,4 +1,5 @@
 import {
+    createPostCommentValidator,
     createPostValidator,
     deletePostValidator,
     getPostCommentsValidator,
@@ -167,7 +168,7 @@ export const getPostComments = [
 ]
 
 export const createPostComment = [
-    validateRequest(createPostComment),
+    validateRequest(createPostCommentValidator),
     async (req, res, next) => {
         try {
             const { id: postId } = req.params

@@ -1,9 +1,9 @@
 import z from "zod"
 import { signupValidator } from "../signup/signupValidators.js"
-import { prisma } from "../config/prisma"
+import { prisma } from "../config/prisma.js"
 
 export const createUserValidator = z.object({
-    body: signupValidator.shape.body.extend({
+    body: signupValidator.shape.body.safeExtend({
         role: z
             .string()
             .trim()
