@@ -10,8 +10,7 @@ import "./style.css"
 import App from "./App"
 import Home from "./pages/Home"
 import About from "./pages/About"
-import Posts from "./pages/Posts"
-import { getPublicPosts } from "./api/posts"
+import Posts, { postsLoader } from "./pages/Posts"
 import Post, { loader } from "./pages/Post"
 
 const router = createBrowserRouter(
@@ -20,7 +19,7 @@ const router = createBrowserRouter(
             <Route index element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/posts">
-                <Route index element={<Posts />} loader={getPublicPosts} />
+                <Route index element={<Posts />} loader={postsLoader} />
                 <Route path=":postId" element={<Post />} loader={loader} />
             </Route>
         </Route>
