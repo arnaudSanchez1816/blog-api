@@ -10,6 +10,8 @@ import {
     NavbarMenuToggle,
 } from "@heroui/react"
 import { useState } from "react"
+import { useLocation } from "react-router"
+import NavLink from "./NavLink"
 
 function BlogLogo({ ...props }) {
     return (
@@ -56,92 +58,119 @@ function SearchIcon({ size = 24, strokeWidth = 1.5, width, height, ...props }) {
 
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
+    const location = useLocation()
+    const locationPathname = location.pathname
 
     return (
-        <header className="dark">
-            <Navbar
-                isBordered
-                disableAnimation
-                isMenuOpen={isMenuOpen}
-                onMenuOpenChange={setIsMenuOpen}
-            >
-                <NavbarContent>
-                    <NavbarMenuToggle
-                        aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-                        className="sm:hidden"
-                    />
-                    <NavbarBrand>
-                        <Link href="/" color="foreground">
-                            <BlogLogo className="h-8 w-8 md:h-12 md:w-12" />
-                            <p className="ml-2 font-bold text-inherit md:text-2xl">
-                                Blog API
-                            </p>
-                        </Link>
-                    </NavbarBrand>
-                </NavbarContent>
+        <Navbar
+            isBordered
+            disableAnimation
+            isMenuOpen={isMenuOpen}
+            onMenuOpenChange={setIsMenuOpen}
+            classNames={{
+                item: [
+                    "flex",
+                    "relative",
+                    "h-full",
+                    "items-center",
+                    "data-[active=true]:font-semibold",
+                    "data-[active=true]:after:content-['']",
+                    "data-[active=true]:after:absolute",
+                    "data-[active=true]:after:bottom-0",
+                    "data-[active=true]:after:left-0",
+                    "data-[active=true]:after:right-0",
+                    "data-[active=true]:after:h-[2px]",
+                    "data-[active=true]:after:rounded-[2px]",
+                    "data-[active=true]:after:bg-primary",
+                ],
+            }}
+        >
+            <NavbarContent>
+                <NavbarMenuToggle
+                    aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+                    className="sm:hidden"
+                />
+                <NavbarBrand>
+                    <Link href="/" color="foreground">
+                        <BlogLogo className="h-8 w-8 md:h-12 md:w-12" />
+                        <p className="ml-2 font-bold text-inherit md:text-2xl">
+                            Blog API
+                        </p>
+                    </Link>
+                </NavbarBrand>
+            </NavbarContent>
 
-                <NavbarContent
-                    className="hidden gap-4 sm:flex"
-                    justify="center"
-                >
-                    <NavbarItem>
-                        <Link underline="hover" href="/posts">
-                            Posts
-                        </Link>
-                    </NavbarItem>
-                    <NavbarItem>
-                        <Link aria-current="page" href="/about">
-                            About
-                        </Link>
-                    </NavbarItem>
-                </NavbarContent>
-                <NavbarContent justify="end" as="div">
-                    <Input
-                        classNames={{
-                            base: "max-w-full sm:max-w-[10rem] h-10",
-                            mainWrapper: "h-full",
-                            input: "text-xs md:text-sm",
-                            inputWrapper:
-                                "h-full font-normal text-default-500 bg-default-400/20 dark:bg-default-500/20",
+            <NavbarContent
+                className="hidden gap-4 font-medium sm:flex"
+                justify="center"
+            >
+                <NavbarItem isActive={locationPathname === "/posts"}>
+                    <NavLink
+                        href="/posts"
+                        className={(isActive) => {
+                            return isActive ? "text-primary" : "text-foreground"
                         }}
-                        placeholder="Search posts"
-                        size="sm"
-                        startContent={<SearchIcon size={18} />}
-                        type="search"
-                    />
-                </NavbarContent>
-                <NavbarMenu>
-                    <NavbarMenuItem>
-                        <Link
-                            className="w-full"
-                            color="foreground"
-                            href="/"
-                            size="lg"
-                            onPress={() => setIsMenuOpen(false)}
-                        >
-                            Home
-                        </Link>
-                        <Link
-                            className="w-full"
-                            color="foreground"
-                            href="/posts"
-                            size="lg"
-                            onPress={() => setIsMenuOpen(false)}
-                        >
-                            Posts
-                        </Link>
-                        <Link
-                            className="w-full"
-                            color="foreground"
-                            href="/about"
-                            size="lg"
-                            onPress={() => setIsMenuOpen(false)}
-                        >
-                            About
-                        </Link>
-                    </NavbarMenuItem>
-                </NavbarMenu>
-            </Navbar>
-        </header>
+                    >
+                        Posts
+                    </NavLink>
+                </NavbarItem>
+                <NavbarItem isActive={locationPathname === "/about"}>
+                    <NavLink
+                        href="/about"
+                        className={(isActive) => {
+                            return isActive ? "text-primary" : "text-foreground"
+                        }}
+                    >
+                        About
+                    </NavLink>
+                </NavbarItem>
+            </NavbarContent>
+            <NavbarContent justify="end" as="div">
+                <Input
+                    classNames={{
+                        base: "max-w-full sm:max-w-[10rem] h-10",
+                        mainWrapper: "h-full",
+                        input: "text-xs md:text-sm",
+                        inputWrapper:
+                            "h-full font-normal text-default-500 bg-default-400/20 dark:bg-default-500/20",
+                    }}
+                    placeholder="Search posts"
+                    size="sm"
+                    startContent={<SearchIcon size={18} />}
+                    type="search"
+                />
+            </NavbarContent>
+            <NavbarMenu>
+                <NavbarMenuItem>
+                    <Link
+                        className="w-full"
+                        color="foreground"
+                        href="/"
+                        size="lg"
+                        onPress={() => setIsMenuOpen(false)}
+                    >
+                        Home
+                    </Link>
+                    <Link
+                        className="w-full"
+                        color="foreground"
+                        href="/posts"
+                        size="lg"
+                        onPress={() => setIsMenuOpen(false)}
+                    >
+                        Posts
+                    </Link>
+                    <Link
+                        className="w-full"
+                        color="foreground"
+                        href="/about"
+                        size="lg"
+                        onPress={() => setIsMenuOpen(false)}
+                    >
+                        About
+                    </Link>
+                </NavbarMenuItem>
+            </NavbarMenu>
+        </Navbar>
     )
 }
