@@ -1,8 +1,9 @@
-import { Link, Pagination } from "@heroui/react"
+import { Divider, Link, Pagination } from "@heroui/react"
 import { useLoaderData, useSearchParams } from "react-router"
 import PostPreview from "../components/PostPreview"
 import { getPublicPosts } from "../api/posts"
 import { useCallback } from "react"
+import useTwBreakpoint from "../hooks/useTwBreakpoint"
 
 export const postsLoader = async ({ request }) => {
     const url = new URL(request.url)
@@ -40,6 +41,7 @@ export default function Posts() {
     const { results: posts } = useLoaderData()
     const [searchParams, setSearchParams] = useSearchParams()
 
+    const isMd = useTwBreakpoint("md")
     const currentPage = Number(searchParams.get("page")) || 1
 
     const setCurrentPage = useCallback(
@@ -58,14 +60,18 @@ export default function Posts() {
     )
 
     return (
-        <div className="m-auto max-w-prose p-8">
-            <div className="flex flex-col gap-4">
+        <>
+            <div className="m-auto max-w-prose pt-6">
                 {posts.length > 0 ? (
                     posts.map((post) => (
-                        <PostPreview post={post} key={post.id} />
+                        <PostPreview
+                            post={post}
+                            key={post.id}
+                            className="[&+*]:mt-12"
+                        />
                     ))
                 ) : (
-                    <div className="flex flex-col gap-4">
+                    <div className="my-4 flex flex-col gap-4">
                         <SadFaceIcon
                             size={48}
                             className="self-center stroke-2"
@@ -82,8 +88,9 @@ export default function Posts() {
                     page={currentPage}
                     onChange={setCurrentPage}
                     total={Math.max(10, currentPage)}
+                    siblings={isMd ? 1 : 0}
                 />
             </div>
-        </div>
+        </>
     )
 }

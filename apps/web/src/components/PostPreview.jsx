@@ -1,4 +1,4 @@
-import { Link } from "@heroui/react"
+import { Divider, Link } from "@heroui/react"
 
 function CommentIcon({ size = 24, strokeWidth = 2, width, height, ...props }) {
     return (
@@ -48,44 +48,46 @@ function ArrowRightIcon({
     )
 }
 
-export default function PostPreview({ post }) {
-    const { id, title, body } = post
+export default function PostPreview({ post, className = "" }) {
+    const { id, title, body, readingTime } = post
     const postHref = `/posts/${id}`
 
     return (
-        <article>
+        <article className={className}>
             <header>
                 <Link color="foreground" underline="hover" href={postHref}>
                     <h1 className="text-2xl font-medium hover:cursor-pointer">
                         {title}
                     </h1>
                 </Link>
-                <div className="text-foreground/70">
-                    <span>
-                        Posted on{" "}
-                        <Link
-                            color="primary"
-                            underline="always"
-                            href={postHref}
-                        >
-                            January 01, 2025
-                        </Link>
-                    </span>
+                <div className="text-foreground/70 mt-2 flex gap-2">
+                    <Link color="primary" underline="always" href={postHref}>
+                        <time dateTime="2025-01-01">January 01, 2025</time>
+                    </Link>
+                    <span>•</span>
+                    <span>{readingTime}</span>
                 </div>
             </header>
-            <div>{body}</div>
+            <div className="my-4">{body}</div>
+            <Divider orientation="horizontal" className="my-4" />
             <footer>
                 <div className="flex justify-between">
-                    <div className="flex gap-1">
-                        <span
-                            className="font-bold"
-                            aria-description="Number of comments"
+                    <div>
+                        <Link
+                            href={`${postHref}#comments`}
+                            className="flex gap-1"
+                            color="foreground"
                         >
-                            39
-                        </span>
-                        <CommentIcon />
+                            <span
+                                className="font-bold"
+                                aria-description="Number of comments"
+                            >
+                                39
+                            </span>
+                            <CommentIcon />
+                        </Link>
                     </div>
-                    <Link href={`/posts/${id}`} className="font-medium">
+                    <Link href={postHref} className="font-medium">
                         Read more
                         <ArrowRightIcon />
                     </Link>

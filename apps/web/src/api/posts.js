@@ -11,10 +11,14 @@ export const getPublicPosts = async ({ page, pageSize }) => {
         if (!response.ok) {
             throw new Error(response.statusText)
         }
-        const responseJson = await response.json()
+        let posts = await response.json()
+
+        posts = posts.map((post) => {
+            return { ...post, readingTime: "3 min read" }
+        })
 
         return {
-            results: responseJson,
+            results: posts,
         }
     } catch (error) {
         console.error(error)
@@ -39,9 +43,12 @@ export const getPublicPost = async (postId) => {
         if (!response.ok) {
             throw new Error(response.statusText)
         }
-        const responseJson = await response.json()
+        const post = await response.json()
 
-        return responseJson
+        return {
+            ...post,
+            readingTime: "3 min read",
+        }
     } catch (error) {
         console.error(error)
         return {}

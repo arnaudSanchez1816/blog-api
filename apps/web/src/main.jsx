@@ -8,7 +8,7 @@ import {
 import { RouterProvider } from "react-router/dom"
 import "./style.css"
 import App from "./App"
-import Home from "./pages/Home"
+import Home, { homeLoader } from "./pages/Home"
 import About from "./pages/About"
 import Posts, { postsLoader } from "./pages/Posts"
 import Post, { loader } from "./pages/Post"
@@ -16,7 +16,7 @@ import Post, { loader } from "./pages/Post"
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/" element={<App />}>
-            <Route index element={<Home />} />
+            <Route index element={<Home />} loader={homeLoader} />
             <Route path="/about" element={<About />} />
             <Route path="/posts">
                 <Route index element={<Posts />} loader={postsLoader} />
