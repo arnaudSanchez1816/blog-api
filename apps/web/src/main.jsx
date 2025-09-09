@@ -12,11 +12,14 @@ import Home, { homeLoader } from "./pages/Home"
 import About from "./pages/About"
 import Posts, { postsLoader } from "./pages/Posts"
 import Post, { loader } from "./pages/Post"
+import AsideLayout, { asideLayoutLoader } from "./layouts/AsideLayout"
 
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/" element={<App />}>
-            <Route index element={<Home />} loader={homeLoader} />
+            <Route element={<AsideLayout />} loader={asideLayoutLoader}>
+                <Route index element={<Home />} loader={homeLoader} />
+            </Route>
             <Route path="/about" element={<About />} />
             <Route path="/posts">
                 <Route index element={<Posts />} loader={postsLoader} />
