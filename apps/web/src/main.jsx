@@ -19,18 +19,35 @@ const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/" element={<App />}>
             <Route element={<AsideLayout />} loader={asideLayoutLoader}>
-                <Route index element={<Home />} loader={homeLoader} />
+                <Route
+                    index
+                    element={<Home />}
+                    loader={homeLoader}
+                    handle={{
+                        title: "Recent posts",
+                    }}
+                />
                 <Route
                     path="/search"
                     element={<Search />}
                     loader={searchLoader}
+                    handle={{
+                        title: "Search",
+                    }}
                 />
+                <Route path="/posts">
+                    <Route
+                        index
+                        element={<Posts />}
+                        loader={postsLoader}
+                        handle={{
+                            title: "All posts",
+                        }}
+                    />
+                    <Route path=":postId" element={<Post />} loader={loader} />
+                </Route>
             </Route>
             <Route path="/about" element={<About />} />
-            <Route path="/posts">
-                <Route index element={<Posts />} loader={postsLoader} />
-                <Route path=":postId" element={<Post />} loader={loader} />
-            </Route>
         </Route>
     )
 )

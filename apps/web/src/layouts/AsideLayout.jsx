@@ -3,6 +3,7 @@ import {
     Form,
     Outlet,
     useLoaderData,
+    useMatches,
     useNavigation,
     useSearchParams,
 } from "react-router"
@@ -23,6 +24,10 @@ export default function AsideLayout() {
     const [searchParams] = useSearchParams()
     const q = searchParams.get("q") || ""
 
+    const matches = useMatches()
+    let title = matches.filter((match) => Boolean(match.handle?.title))[0]
+        ?.handle?.title
+
     useEffect(() => {
         if (searchInputRef.current) {
             searchInputRef.current.value = q
@@ -30,8 +35,17 @@ export default function AsideLayout() {
     }, [navigation, q])
 
     return (
-        <div className="mx-auto pt-6 xl:grid xl:grid-cols-[1fr_auto_1fr] xl:justify-center xl:gap-x-16">
-            <Outlet />
+        <div className="mx-auto pt-6 xl:grid xl:grid-cols-[1fr_minmax(auto,65ch)_1fr] xl:justify-center xl:gap-x-16">
+            <div className="m-auto max-w-prose xl:m-0 xl:justify-self-end">
+                {title && (
+                    <h1 className="text-2xl font-medium md:text-3xl">
+                        {title}
+                    </h1>
+                )}
+            </div>
+            <div className="m-auto mt-8 w-full max-w-prose xl:mt-0">
+                <Outlet />
+            </div>
             <aside className="mx-auto mt-12 max-w-prose xl:mx-0 xl:mt-0 xl:max-w-xs">
                 <Form
                     className="flex flex-nowrap gap-4"

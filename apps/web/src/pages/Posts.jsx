@@ -26,7 +26,7 @@ export default function Posts() {
 
     return (
         <>
-            <div className="m-auto max-w-prose pt-6">
+            <div>
                 {posts.length > 0 ? (
                     posts.map((post) => (
                         <PostPreview

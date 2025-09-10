@@ -46,23 +46,18 @@ export default function Search() {
 
     return (
         <>
-            <div className="m-auto max-w-prose xl:m-0 xl:justify-self-end">
-                <h1 className="text-2xl font-medium md:text-3xl">Search</h1>
-            </div>
-            <div className="m-auto mt-8 max-w-prose xl:mt-0">
-                <div>{postsRender}</div>
-                {count >= pageSize && (
-                    <div className="mt-8 flex justify-center">
-                        <Pagination
-                            showControls
-                            page={currentPage}
-                            onChange={setCurrentPage}
-                            total={Math.floor(count / pageSize)}
-                            siblings={isMd ? 1 : 0}
-                        />
-                    </div>
-                )}
-            </div>
+            <div>{postsRender}</div>
+            {count >= pageSize && (
+                <div className="mt-8 flex justify-center">
+                    <Pagination
+                        showControls
+                        page={currentPage}
+                        onChange={setCurrentPage}
+                        total={Math.floor(count / pageSize)}
+                        siblings={isMd ? 1 : 0}
+                    />
+                </div>
+            )}
         </>
     )
 }
