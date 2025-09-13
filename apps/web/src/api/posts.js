@@ -56,6 +56,14 @@ export const getPublicPost = async (postId) => {
             ...post,
             body: placeholderBody,
             readingTime: "3 min read",
+            tags: [
+                {
+                    id: 1,
+                    name: "JavaScript",
+                    slug: "js",
+                },
+            ],
+            commentsCount: 5,
         }
     } catch (error) {
         console.error(error)

@@ -1,7 +1,7 @@
 import { Divider, Image, Link, Snippet } from "@heroui/react"
 import Markdown from "react-markdown"
-import SyntaxHighlighter from "react-syntax-highlighter"
-import { prism } from "react-syntax-highlighter/dist/esm/styles/prism"
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
+import { prism, tomorrow } from "react-syntax-highlighter/dist/esm/styles/prism"
 import emoji from "remark-emoji"
 import textr from "remark-textr"
 
@@ -59,9 +59,10 @@ export default function PostMarkdown({ children, ...props }) {
                             {...rest}
                             PreTag="div"
                             language={match[1]}
-                            style={prism}
+                            style={tomorrow}
+                            customStyle={{ borderRadius: "8px" }}
                         >
-                            {String(children).replace(/\n$/, "")}
+                            {children}
                         </SyntaxHighlighter>
                     ) : (
                         <Snippet

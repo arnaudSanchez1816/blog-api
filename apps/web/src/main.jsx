@@ -11,7 +11,7 @@ import App from "./App"
 import Home, { homeLoader } from "./pages/Home"
 import About from "./pages/About"
 import Posts, { postsLoader } from "./pages/Posts"
-import Post, { loader } from "./pages/Post"
+import PostPage, { postPageLoader } from "./pages/Post"
 import AsideLayout, { asideLayoutLoader } from "./layouts/AsideLayout"
 import Search, { searchLoader } from "./pages/Search"
 
@@ -44,7 +44,11 @@ const router = createBrowserRouter(
                             title: "All posts",
                         }}
                     />
-                    <Route path=":postId" element={<Post />} loader={loader} />
+                    <Route
+                        path=":postId"
+                        element={<PostPage />}
+                        loader={postPageLoader}
+                    />
                 </Route>
             </Route>
             <Route path="/about" element={<About />} />

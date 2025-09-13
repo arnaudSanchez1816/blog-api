@@ -10,6 +10,7 @@ import {
 import SearchIcon from "../components/SearchIcon"
 import { getTags } from "../api/tags"
 import { useEffect, useRef } from "react"
+import Tag from "../components/Tag"
 
 export async function asideLayoutLoader() {
     const tags = await getTags()
@@ -81,16 +82,7 @@ export default function AsideLayout() {
                     <h3 className="text-lg font-medium">All tags</h3>
                     <div className="mt-6 flex max-w-full flex-wrap gap-2">
                         {tags.map((tag) => (
-                            <Button
-                                key={tag.id}
-                                color="secondary"
-                                as={Link}
-                                href={`/search?tag=${tag.slug}`}
-                                size="sm"
-                                radius="sm"
-                            >
-                                {tag.name}
-                            </Button>
+                            <Tag key={tag.id} tag={tag} />
                         ))}
                     </div>
                 </div>
