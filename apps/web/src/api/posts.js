@@ -1,3 +1,5 @@
+import placeholderBodyUrl from "../assets/markdown_placeholder.txt"
+
 export const getPublicPosts = async ({ page, pageSize }) => {
     try {
         const searchParams = new URLSearchParams()
@@ -44,10 +46,15 @@ export const getPublicPost = async (postId) => {
         if (!response.ok) {
             throw new Error(response.statusText)
         }
+
+        const placeholderBodyFetch = await fetch(placeholderBodyUrl)
+        const placeholderBody = await placeholderBodyFetch.text()
+
         const post = await response.json()
 
         return {
             ...post,
+            body: placeholderBody,
             readingTime: "3 min read",
         }
     } catch (error) {
