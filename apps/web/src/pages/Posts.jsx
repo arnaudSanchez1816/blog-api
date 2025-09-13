@@ -1,6 +1,6 @@
 import { Pagination } from "@heroui/react"
 import { useLoaderData } from "react-router"
-import PostPreview from "../components/PostPreview"
+import PostItem from "../components/PostItem"
 import { getPublicPosts } from "../api/posts"
 import useTwBreakpoint from "../hooks/useTwBreakpoint"
 import SadFaceIcon from "../components/SadFaceIcon"
@@ -29,7 +29,7 @@ export default function Posts() {
             <div>
                 {posts.length > 0 ? (
                     posts.map((post) => (
-                        <PostPreview
+                        <PostItem
                             post={post}
                             key={post.id}
                             className="[&+*]:mt-12"

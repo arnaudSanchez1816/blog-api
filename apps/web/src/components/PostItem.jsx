@@ -48,7 +48,7 @@ function ArrowRightIcon({
     )
 }
 
-export default function PostPreview({ post, className = "" }) {
+export default function PostItem({ post, className = "" }) {
     const { id, title, body, readingTime } = post
     const postHref = `/posts/${id}`
 

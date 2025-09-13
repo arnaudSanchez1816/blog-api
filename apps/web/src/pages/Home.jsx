@@ -1,6 +1,6 @@
 import { useLoaderData } from "react-router"
 import { getPublicPosts } from "../api/posts"
-import PostPreview from "../components/PostPreview"
+import PostItem from "../components/PostItem"
 
 export async function homeLoader() {
     const posts = await getPublicPosts({
@@ -17,11 +17,7 @@ export default function Home() {
     return (
         <>
             {posts.map((post) => (
-                <PostPreview
-                    post={post}
-                    key={post.id}
-                    className="[&+*]:mt-12"
-                />
+                <PostItem post={post} key={post.id} className="[&+*]:mt-12" />
             ))}
         </>
     )

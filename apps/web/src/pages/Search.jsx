@@ -1,6 +1,6 @@
 import { useLoaderData } from "react-router"
 import { getPublicPosts } from "../api/posts"
-import PostPreview from "../components/PostPreview"
+import PostItem from "../components/PostItem"
 import SadFaceIcon from "../components/SadFaceIcon"
 import { Pagination } from "@heroui/react"
 import useTwBreakpoint from "../hooks/useTwBreakpoint"
@@ -40,7 +40,7 @@ export default function Search() {
         )
     } else {
         postsRender = posts.map((post) => (
-            <PostPreview post={post} key={post.id} className="[&+*]:mt-12" />
+            <PostItem post={post} key={post.id} className="[&+*]:mt-12" />
         ))
     }
 
