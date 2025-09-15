@@ -1,7 +1,7 @@
 import { useLoaderData } from "react-router"
 import { getPublicPosts } from "../api/posts"
 import PostItem from "../components/PostItem"
-import SadFaceIcon from "../components/SadFaceIcon"
+import SadFaceIcon from "../components/Icons/SadFaceIcon"
 import { Pagination } from "@heroui/react"
 import useTwBreakpoint from "../hooks/useTwBreakpoint"
 import usePageSearchParams from "../hooks/usePageSearchParams"

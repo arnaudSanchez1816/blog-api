@@ -3,7 +3,7 @@ import { useLoaderData } from "react-router"
 import PostItem from "../components/PostItem"
 import { getPublicPosts } from "../api/posts"
 import useTwBreakpoint from "../hooks/useTwBreakpoint"
-import SadFaceIcon from "../components/SadFaceIcon"
+import SadFaceIcon from "../components/Icons/SadFaceIcon"
 import usePageSearchParams from "../hooks/usePageSearchParams"
 
 export const postsLoader = async ({ request }) => {

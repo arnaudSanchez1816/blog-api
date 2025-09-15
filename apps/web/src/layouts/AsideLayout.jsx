@@ -7,7 +7,7 @@ import {
     useNavigation,
     useSearchParams,
 } from "react-router"
-import SearchIcon from "../components/SearchIcon"
+import SearchIcon from "../components/Icons/SearchIcon"
 import { getTags } from "../api/tags"
 import { useEffect, useRef } from "react"
 import Tag from "../components/Tag"
