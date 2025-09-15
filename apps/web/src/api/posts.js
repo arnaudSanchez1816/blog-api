@@ -1,4 +1,3 @@
-import { data } from "react-router"
 import placeholderBodyUrl from "../assets/markdown_placeholder.txt"
 
 export const getPublicPosts = async ({ page, pageSize }) => {
