@@ -20,7 +20,6 @@ async function fetchComments(
         if (!response.ok) {
             throw new Error("Failed to fetch comments")
         }
-        await new Promise((res) => setTimeout(res, 1500))
 
         const jsonData = await response.json()
         if (abortSignal.aborted) {
