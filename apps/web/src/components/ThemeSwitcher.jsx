@@ -16,7 +16,7 @@ export default function ThemeSwitcher() {
                 variant="bordered"
                 className={`items-center justify-center ${theme === "dark" ? "flex" : "hidden"}`}
             >
-                <SunIcon className={`h-6 w-6 fill-current`} />
+                <SunIcon className="fill-current" width={24} />
             </Button>
             <Button
                 isIconOnly
@@ -26,7 +26,7 @@ export default function ThemeSwitcher() {
                 variant="bordered"
                 className={`items-center justify-center ${theme === "light" ? "flex" : "hidden"}`}
             >
-                <MoonIcon className={`h-6 w-6 fill-current`} />
+                <MoonIcon className="fill-current" width={24} />
             </Button>
         </div>
     )
