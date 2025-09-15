@@ -14,44 +14,47 @@ import Posts, { postsLoader } from "./pages/Posts"
 import PostPage, { postPageLoader } from "./pages/Post"
 import AsideLayout, { asideLayoutLoader } from "./layouts/AsideLayout"
 import Search, { searchLoader } from "./pages/Search"
+import ErrorPage from "./pages/Error"
 
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/" element={<App />}>
-            <Route element={<AsideLayout />} loader={asideLayoutLoader}>
-                <Route
-                    index
-                    element={<Home />}
-                    loader={homeLoader}
-                    handle={{
-                        title: "Recent posts",
-                    }}
-                />
-                <Route
-                    path="/search"
-                    element={<Search />}
-                    loader={searchLoader}
-                    handle={{
-                        title: "Search",
-                    }}
-                />
-                <Route path="/posts">
+            <Route ErrorBoundary={ErrorPage}>
+                <Route element={<AsideLayout />} loader={asideLayoutLoader}>
                     <Route
                         index
-                        element={<Posts />}
-                        loader={postsLoader}
+                        element={<Home />}
+                        loader={homeLoader}
                         handle={{
-                            title: "All posts",
+                            title: "Recent posts",
                         }}
                     />
                     <Route
-                        path=":postId"
-                        element={<PostPage />}
-                        loader={postPageLoader}
+                        path="/search"
+                        element={<Search />}
+                        loader={searchLoader}
+                        handle={{
+                            title: "Search",
+                        }}
                     />
+                    <Route path="/posts">
+                        <Route
+                            index
+                            element={<Posts />}
+                            loader={postsLoader}
+                            handle={{
+                                title: "All posts",
+                            }}
+                        />
+                        <Route
+                            path=":postId"
+                            element={<PostPage />}
+                            loader={postPageLoader}
+                        />
+                    </Route>
                 </Route>
+                <Route path="/about" element={<About />} />
             </Route>
-            <Route path="/about" element={<About />} />
         </Route>
     )
 )

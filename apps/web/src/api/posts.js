@@ -1,72 +1,56 @@
+import { data } from "react-router"
 import placeholderBodyUrl from "../assets/markdown_placeholder.txt"
 
 export const getPublicPosts = async ({ page, pageSize }) => {
-    try {
-        const searchParams = new URLSearchParams()
-        searchParams.set("_page", page)
-        searchParams.set("_limit", pageSize)
-        const response = await fetch(
-            `https://jsonplaceholder.typicode.com/posts?${searchParams}`,
-            { mode: "cors" }
-        )
+    const searchParams = new URLSearchParams()
+    searchParams.set("_page", page)
+    searchParams.set("_limit", pageSize)
+    const response = await fetch(
+        `https://jsonplaceholder.typicode.com/posts?${searchParams}`,
+        { mode: "cors" }
+    )
 
-        if (!response.ok) {
-            throw new Error(response.statusText)
-        }
-        let posts = await response.json()
+    if (!response.ok) {
+        throw response
+    }
+    let posts = await response.json()
 
-        posts = posts.map((post) => {
-            return { ...post, readingTime: "3 min read" }
-        })
+    posts = posts.map((post) => {
+        return { ...post, readingTime: "3 min read" }
+    })
 
-        return {
-            count: 100,
-            results: posts,
-        }
-    } catch (error) {
-        console.error(error)
-        return {
-            results: [],
-        }
+    return {
+        count: 100,
+        results: posts,
     }
 }
 
 export const getPublicPost = async (postId) => {
-    try {
-        postId = Number(postId)
-        if (isNaN(postId)) {
-            throw new Error("postId invalid")
-        }
+    const response = await fetch(
+        `https://jsonplaceholder.typicode.com/posts/${postId}`,
+        { mode: "cors" }
+    )
 
-        const response = await fetch(
-            `https://jsonplaceholder.typicode.com/posts/${postId}`,
-            { mode: "cors" }
-        )
+    if (!response.ok) {
+        throw response
+    }
 
-        if (!response.ok) {
-            throw new Error(response.statusText)
-        }
+    const placeholderBodyFetch = await fetch(placeholderBodyUrl)
+    const placeholderBody = await placeholderBodyFetch.text()
 
-        const placeholderBodyFetch = await fetch(placeholderBodyUrl)
-        const placeholderBody = await placeholderBodyFetch.text()
+    const post = await response.json()
 
-        const post = await response.json()
-
-        return {
-            ...post,
-            body: placeholderBody,
-            readingTime: "3 min read",
-            tags: [
-                {
-                    id: 1,
-                    name: "JavaScript",
-                    slug: "js",
-                },
-            ],
-            commentsCount: 5,
-        }
-    } catch (error) {
-        console.error(error)
-        return {}
+    return {
+        ...post,
+        body: placeholderBody,
+        readingTime: "3 min read",
+        tags: [
+            {
+                id: 1,
+                name: "JavaScript",
+                slug: "js",
+            },
+        ],
+        commentsCount: 5,
     }
 }
