@@ -10,9 +10,9 @@ export const checkPermission = (permission) => (req, res, next) => {
     try {
         const user = req.user
         const userRoles = user.roles
-        const rolesWithPermissions = userRoles.filter((r) =>
-            r.permissions.includes(permission)
-        )
+        const rolesWithPermissions = userRoles.filter((r) => {
+            return r.permissions.find((p) => p.type === permission)
+        })
 
         if (!rolesWithPermissions || rolesWithPermissions.length === 0) {
             throw new createHttpError.Forbidden()
