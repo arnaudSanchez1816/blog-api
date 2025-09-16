@@ -113,7 +113,7 @@ export const getPostDetails = async (
     postId,
     { includeComments = false } = {}
 ) => {
-    const post = await prisma.post.findUnique({
+    const { _count, ...post } = await prisma.post.findUnique({
         where: {
             id: postId,
         },
@@ -125,13 +125,18 @@ export const getPostDetails = async (
                     name: true,
                 },
             },
+            _count: {
+                select: {
+                    comments: true,
+                },
+            },
             ...(includeComments && {
                 comments: true,
             }),
         },
     })
 
-    return post
+    return { ...post, commentsCount: _count.comments }
 }
 
 export const userCanViewPost = (post, userId) => {
