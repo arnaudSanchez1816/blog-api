@@ -4,10 +4,10 @@ export const getPublicPosts = async ({ page, pageSize }) => {
     const searchParams = new URLSearchParams()
     searchParams.set("_page", page)
     searchParams.set("_limit", pageSize)
-    const response = await fetch(
-        `https://jsonplaceholder.typicode.com/posts?${searchParams}`,
-        { mode: "cors" }
-    )
+    const apiUrl = import.meta.env.VITE_API_URL
+    const response = await fetch(`${apiUrl}/posts?${searchParams}`, {
+        mode: "cors",
+    })
 
     if (!response.ok) {
         throw response
@@ -25,10 +25,8 @@ export const getPublicPosts = async ({ page, pageSize }) => {
 }
 
 export const getPublicPost = async (postId) => {
-    const response = await fetch(
-        `https://jsonplaceholder.typicode.com/posts/${postId}`,
-        { mode: "cors" }
-    )
+    const apiUrl = import.meta.env.VITE_API_URL
+    const response = await fetch(`${apiUrl}/posts/${postId}`, { mode: "cors" })
 
     if (!response.ok) {
         throw response
