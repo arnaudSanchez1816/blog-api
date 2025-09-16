@@ -45,6 +45,7 @@ app.use((req, res, next) => {
 // Error handler
 // eslint-disable-next-line
 app.use((error, req, res, next) => {
+    pino.error(error)
     let errors = error.message
     if (error instanceof ZodError) {
         error = error.issues.map((e) => {
@@ -56,7 +57,6 @@ app.use((error, req, res, next) => {
         error.status = 400
     }
 
-    pino.error(error)
     return res.status(error.status || 500).json({ errors })
 })
 
