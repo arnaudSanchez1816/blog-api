@@ -36,6 +36,13 @@ export const getPosts = async ({
                 id: sortBy === SortByValues.idAsc ? "asc" : "desc",
             }),
         },
+        include: {
+            _count: {
+                select: {
+                    comments: true,
+                },
+            },
+        },
     }
 
     if (pageSize > 0) {
@@ -43,7 +50,7 @@ export const getPosts = async ({
         queryOptions.take = pageSize
     }
 
-    const [posts, countPosts] = await prisma.$transaction([
+    let [posts, countPosts] = await prisma.$transaction([
         prisma.post.findMany(queryOptions),
         prisma.post.count({
             where: {
@@ -56,6 +63,14 @@ export const getPosts = async ({
             },
         }),
     ])
+
+    posts = posts.map((p) => {
+        const { _count, ...post } = p
+        return {
+            ...post,
+            commentsCount: _count.comments,
+        }
+    })
 
     return { posts, count: countPosts }
 }
