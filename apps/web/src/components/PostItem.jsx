@@ -1,4 +1,5 @@
 import { Divider, Link } from "@heroui/react"
+import { format } from "date-fns"
 
 function CommentIcon({ size = 24, strokeWidth = 2, width, height, ...props }) {
     return (
@@ -49,7 +50,7 @@ function ArrowRightIcon({
 }
 
 export default function PostItem({ post, className = "" }) {
-    const { id, title, body, readingTime } = post
+    const { id, title, body, readingTime, publishedAt, commentsCount } = post
     const postHref = `/posts/${id}`
 
     return (
@@ -62,7 +63,9 @@ export default function PostItem({ post, className = "" }) {
                 </Link>
                 <div className="text-foreground/70 mt-2 flex gap-2">
                     <Link color="primary" underline="always" href={postHref}>
-                        <time dateTime="2025-01-01">January 01, 2025</time>
+                        <time dateTime="2025-01-01">
+                            {format(publishedAt, "MMMM dd, y")}
+                        </time>
                     </Link>
                     <span>•</span>
                     <span>{readingTime}</span>
@@ -82,7 +85,7 @@ export default function PostItem({ post, className = "" }) {
                                 className="font-bold"
                                 aria-description="Number of comments"
                             >
-                                39
+                                {commentsCount}
                             </span>
                             <CommentIcon />
                         </Link>
