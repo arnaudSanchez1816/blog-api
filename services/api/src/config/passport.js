@@ -1,6 +1,7 @@
 import passport from "passport"
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt"
 import { Strategy as LocalStrategy } from "passport-local"
+import { Strategy as AnonymousStrategy } from "passport-anonymous"
 import bcrypt from "bcryptjs"
 import userService from "../users/usersService.js"
 
@@ -60,9 +61,13 @@ const localStrategy = new LocalStrategy(
 )
 passport.use(localStrategy)
 
+const anonymousStrategy = new AnonymousStrategy()
+passport.use(anonymousStrategy)
+
 export const strategies = {
     local: localStrategy.name,
     jwt: jwtStrategy.name,
+    anonymous: anonymousStrategy.name,
 }
 
 export default passport

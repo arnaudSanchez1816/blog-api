@@ -27,9 +27,8 @@ idRouter
 idRouter
     .route("/comments")
     .all(
-        passport.authenticate(strategies.jwt, {
+        passport.authenticate([strategies.jwt, strategies.anonymous], {
             session: false,
-            failWithError: false,
         })
     )
     .get(getPostComments)
@@ -39,9 +38,8 @@ idRouter
 idRouter
     .route("/")
     .get(
-        passport.authenticate(strategies.jwt, {
+        passport.authenticate([strategies.jwt, strategies.anonymous], {
             session: false,
-            failWithError: false,
         }),
         getPost
     )

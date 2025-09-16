@@ -20,7 +20,7 @@ export const getPost = [
     async (req, res, next) => {
         try {
             const { id } = req.params
-            const { id: userId } = req.user
+            const { id: userId } = req.user || {}
 
             const post = await postsService.getPostDetails(id)
             if (!post) {
@@ -172,7 +172,7 @@ export const getPostComments = [
     async (req, res, next) => {
         try {
             const { id: postId } = req.params
-            const { id: userId } = req.user
+            const { id: userId } = req.user || {}
             const post = await postsService.getPostDetails(postId)
             if (!post) {
                 throw new createHttpError.NotFound()
