@@ -12,6 +12,7 @@ import commentsRouter from "./comments/commentsRouter.js"
 import passport from "./config/passport.js"
 import { pino } from "./config/pino.js"
 import { ZodError } from "zod"
+import cors from "cors"
 
 const app = express()
 
@@ -21,6 +22,7 @@ app.use(helmet())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
+app.use(cors())
 // Passport
 app.use(passport.initialize())
 
