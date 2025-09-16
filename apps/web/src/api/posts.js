@@ -2,8 +2,12 @@ import placeholderBodyUrl from "../assets/markdown_placeholder.txt"
 
 export const getPublicPosts = async ({ page, pageSize }) => {
     const searchParams = new URLSearchParams()
-    searchParams.set("_page", page)
-    searchParams.set("_limit", pageSize)
+    if (page) {
+        searchParams.set("page", page)
+    }
+    if (pageSize) {
+        searchParams.set("pageSize", pageSize)
+    }
     const apiUrl = import.meta.env.VITE_API_URL
     const response = await fetch(`${apiUrl}/posts?${searchParams}`, {
         mode: "cors",
@@ -12,15 +16,15 @@ export const getPublicPosts = async ({ page, pageSize }) => {
     if (!response.ok) {
         throw response
     }
-    let posts = await response.json()
+    let { results, ...dataJson } = await response.json()
 
-    posts = posts.map((post) => {
+    results = results.map((post) => {
         return { ...post, readingTime: "3 min read" }
     })
 
     return {
-        count: 100,
-        results: posts,
+        ...dataJson,
+        results,
     }
 }
 

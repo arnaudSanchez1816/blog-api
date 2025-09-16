@@ -19,10 +19,13 @@ export const postsLoader = async ({ request }) => {
 }
 
 export default function Posts() {
-    const { results: posts } = useLoaderData()
+    const { metadata, results: posts } = useLoaderData()
+    const { count, pageSize } = metadata
     const [currentPage, setCurrentPage] = usePageSearchParams()
 
     const isMd = useTwBreakpoint("md")
+
+    const totalPages = Math.max(count / Math.max(pageSize, 1), currentPage)
 
     return (
         <>
@@ -47,15 +50,17 @@ export default function Posts() {
                     </div>
                 )}
             </div>
-            <div className="mt-8 flex justify-center">
-                <Pagination
-                    showControls
-                    page={currentPage}
-                    onChange={setCurrentPage}
-                    total={Math.max(10, currentPage)}
-                    siblings={isMd ? 1 : 0}
-                />
-            </div>
+            {totalPages > 1 && (
+                <div className="mt-8 flex justify-center">
+                    <Pagination
+                        showControls
+                        page={currentPage}
+                        onChange={setCurrentPage}
+                        total={Math.max(totalPages, currentPage)}
+                        siblings={isMd ? 1 : 0}
+                    />
+                </div>
+            )}
         </>
     )
 }
