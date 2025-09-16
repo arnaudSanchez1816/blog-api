@@ -6,10 +6,20 @@ import {
     useState,
 } from "react"
 
+/**
+ *
+ * @callback SetTheme
+ * @param {"dark" | "light"} newTheme - New theme name.
+ */
+
 export const ThemeContext = createContext({
     themeHtmlElement: document.documentElement,
 })
 
+/**
+ *
+ * @returns {[theme: String, setTheme: SetTheme]}
+ */
 export default function useTheme() {
     const { themeHtmlElement } = useContext(ThemeContext)
 
