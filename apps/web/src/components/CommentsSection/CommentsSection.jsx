@@ -1,49 +1,8 @@
 import { Alert, Button } from "@heroui/react"
-import { useCallback, useEffect, useState } from "react"
 import Comment from "./Comment"
 import CommentSkeleton from "./CommentSkeleton"
 import CommentReplyForm from "./CommentReplyForm"
-
-async function fetchComments(
-    postId,
-    setComments,
-    setLoading,
-    setError,
-    abortSignal
-) {
-    try {
-        setLoading(true)
-        const response = await fetch(
-            `https://jsonplaceholder.typicode.com/posts/${postId}/comments`,
-            { mode: "cors" }
-        )
-        if (!response.ok) {
-            throw new Error("Failed to fetch comments")
-        }
-
-        const jsonData = await response.json()
-        if (abortSignal.aborted) {
-            return
-        }
-
-        setComments({
-            count: jsonData.length,
-            results: jsonData,
-        })
-        setError(undefined)
-        console.dir(jsonData)
-    } catch (error) {
-        if (abortSignal.aborted) {
-            return
-        }
-        setError(error)
-        setComments(undefined)
-    } finally {
-        if (!abortSignal.aborted) {
-            setLoading(false)
-        }
-    }
-}
+import useData from "../../hooks/useData"
 
 function CommentsSectionWrapper({
     commentsCount,
@@ -64,43 +23,24 @@ function CommentsSectionWrapper({
 }
 
 export default function CommentsSection({ postId, commentsCount }) {
-    const [triggerFetch, setTriggerFetch] = useState(false)
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState(undefined)
-    const [commentsData, setCommentsData] = useState(undefined)
-
-    useEffect(() => {
-        let fetchAbortCt
-
-        if (triggerFetch) {
-            fetchAbortCt = new AbortController()
-            fetchComments(
-                postId,
-                setCommentsData,
-                setLoading,
-                setError,
-                fetchAbortCt.signal
-            ).then(() => {
-                setTriggerFetch(false)
-            })
-        }
-
-        return () => {
-            if (fetchAbortCt) {
-                fetchAbortCt.abort()
-            }
-        }
-    }, [triggerFetch, setTriggerFetch, postId])
-
-    const triggerFetchComments = useCallback(() => {
-        setTriggerFetch(true)
-    }, [setTriggerFetch])
+    const {
+        data: comments,
+        error,
+        loading,
+        triggerFetch,
+    } = useData(`/posts/${postId}/comments`, {
+        mode: "cors",
+        morphDataCb: (data) => {
+            return { count: data.length, results: data }
+        },
+        fetchManually: true,
+    })
 
     if (error) {
         return (
             <CommentsSectionWrapper
                 commentsCount={commentsCount}
-                fetchComments={triggerFetchComments}
+                fetchComments={triggerFetch}
                 postId={postId}
             >
                 <Alert
@@ -119,7 +59,7 @@ export default function CommentsSection({ postId, commentsCount }) {
         return (
             <CommentsSectionWrapper
                 commentsCount={commentsCount}
-                fetchComments={triggerFetchComments}
+                fetchComments={triggerFetch}
                 postId={postId}
             >
                 {skeletons}
@@ -127,7 +67,7 @@ export default function CommentsSection({ postId, commentsCount }) {
         )
     }
 
-    if (!commentsData) {
+    if (!comments) {
         if (commentsCount <= 0) {
             return (
                 <div className="flex items-center justify-center">
@@ -140,13 +80,13 @@ export default function CommentsSection({ postId, commentsCount }) {
             return (
                 <CommentsSectionWrapper
                     commentsCount={commentsCount}
-                    fetchComments={triggerFetchComments}
+                    fetchComments={triggerFetch}
                     postId={postId}
                 >
                     <div className="mt-8 flex justify-center">
                         <Button
                             color="default"
-                            onPress={() => setTriggerFetch(true)}
+                            onPress={() => triggerFetch()}
                             radius="sm"
                         >
                             View Comments
@@ -157,11 +97,11 @@ export default function CommentsSection({ postId, commentsCount }) {
         }
     }
 
-    const { results } = commentsData
+    const { results } = comments
     return (
         <CommentsSectionWrapper
             commentsCount={commentsCount}
-            fetchComments={triggerFetchComments}
+            fetchComments={triggerFetch}
             postId={postId}
         >
             {results.map((comment) => (

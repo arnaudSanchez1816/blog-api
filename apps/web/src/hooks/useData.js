@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from "react"
 
+const API_URL = import.meta.env.VITE_API_URL
+
 export default function useData(
     dataUrl,
     { mode = "cors", fetchManually = false, morphDataCb = (data) => data } = {}
@@ -16,7 +18,8 @@ export default function useData(
             const fetchData = async () => {
                 setLoading(true)
                 try {
-                    const res = await fetch(dataUrl, { mode })
+                    const url = new URL(dataUrl, API_URL)
+                    const res = await fetch(url, { mode })
                     if (!res.ok) {
                         throw res
                     }
