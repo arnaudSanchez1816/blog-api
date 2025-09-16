@@ -54,6 +54,7 @@ export const getPublishedPosts = [
                     count: count,
                     page: page,
                     pageSize: pageSize,
+                    sortBy: sortBy,
                 },
                 results: posts,
             }

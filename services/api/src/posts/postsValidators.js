@@ -8,9 +8,10 @@ export const getPublishedPostsValidator = z.object({
     query: z.object({
         sortBy: z
             .enum(Object.entries(SortByValues).map(([k, v]) => v))
-            .optional(),
-        page: z.coerce.number().int().min(0).optional(),
-        pageSize: z.coerce.number().int().min(1).max(50).optional(),
+            .optional()
+            .default(SortByValues.publishedAtDesc),
+        page: z.coerce.number().int().min(0).optional().default(1),
+        pageSize: z.coerce.number().int().min(1).max(50).optional().default(20),
     }),
 })
 
