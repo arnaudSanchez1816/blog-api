@@ -36,6 +36,12 @@ export const deletePostValidator = z.object({
     }),
 })
 
+export const publishPostValidator = z.object({
+    params: z.object({
+        id: postIdSchema,
+    }),
+})
+
 export const getPublishedPostValidator = z.object({
     params: z.object({
         id: postIdSchema,

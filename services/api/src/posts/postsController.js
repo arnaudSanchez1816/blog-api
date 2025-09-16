@@ -5,6 +5,7 @@ import {
     getPostCommentsValidator,
     getPublishedPostsValidator,
     getPublishedPostValidator,
+    publishPostValidator,
     updatePostValidator,
 } from "./postsValidators.js"
 import postsService, { userCanViewPost } from "./postsService.js"
@@ -130,6 +131,33 @@ export const deletePost = [
             }
 
             await postsService.deletePost(postId)
+
+            return res.status(204).send()
+        } catch (error) {
+            next(error)
+        }
+    },
+]
+
+export const publishPost = [
+    checkPermission(PermissionType.UPDATE),
+    validateRequest(publishPostValidator),
+    async (req, res, next) => {
+        try {
+            const { id: postId } = req.params
+            const { id: userId } = req.user
+            const post = await postsService.getPostDetails(postId)
+            if (!post) {
+                throw new createHttpError.NotFound()
+            }
+            if (post.authorId !== userId) {
+                throw new createHttpError.Forbidden()
+            }
+            if (post.publishedAt) {
+                return res.status(204).send()
+            }
+
+            await postsService.publishPost(postId)
 
             return res.status(204).send()
         } catch (error) {

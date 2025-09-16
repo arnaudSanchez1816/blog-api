@@ -96,6 +96,19 @@ export const deletePost = async (postId) => {
     return deletedPost
 }
 
+export const publishPost = async (postId) => {
+    const publishedPost = await prisma.post.update({
+        where: {
+            id: postId,
+        },
+        data: {
+            publishedAt: new Date(),
+        },
+    })
+
+    return publishedPost
+}
+
 export const getPostDetails = async (
     postId,
     { includeComments = false } = {}

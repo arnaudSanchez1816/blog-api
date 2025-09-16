@@ -7,12 +7,21 @@ import {
     getPost,
     getPostComments,
     createPostComment,
+    publishPost,
 } from "./postsController.js"
 import passport from "passport"
 import { strategies } from "../config/passport.js"
 
 const router = Router()
-const idRouter = Router()
+const idRouter = Router({ mergeParams: true })
+
+// /posts/:id/publish
+idRouter
+    .route("/publish")
+    .post(
+        passport.authenticate(strategies.jwt, { session: false }),
+        publishPost
+    )
 
 // /posts/:id/comments
 idRouter
@@ -25,6 +34,7 @@ idRouter
     )
     .get(getPostComments)
     .post(createPostComment)
+
 // /posts/:id
 idRouter
     .route("/")
