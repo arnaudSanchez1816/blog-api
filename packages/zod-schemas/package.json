@@ -1,0 +1,12 @@
+{
+    "name": "@repo/zod-schemas",
+    "version": "0.0.0",
+    "type": "module",
+    "private": true,
+    "exports": {
+        ".": "./index.js"
+    },
+    "dependencies": {
+        "zod": "^4.1.5"
+    }
+}
