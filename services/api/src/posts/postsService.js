@@ -9,12 +9,12 @@ export const SortByValues = {
 
 export const getPosts = async ({
     sortBy = SortByValues.publishedAtDesc,
-    page = 0,
+    page = 1,
     pageSize = -1,
     publishedOnly = true,
     authorId = undefined,
 } = {}) => {
-    page = Math.max(page, 0)
+    page = Math.max(page, 1)
 
     const queryOptions = {
         where: {
@@ -39,7 +39,7 @@ export const getPosts = async ({
     }
 
     if (pageSize > 0) {
-        queryOptions.skip = page * pageSize
+        queryOptions.skip = (page - 1) * pageSize
         queryOptions.take = pageSize
     }
 
