@@ -173,7 +173,9 @@ export const getPostComments = [
         try {
             const { id: postId } = req.params
             const { id: userId } = req.user || {}
-            const post = await postsService.getPostDetails(postId)
+            const post = await postsService.getPostDetails(postId, {
+                includeComments: true,
+            })
             if (!post) {
                 throw new createHttpError.NotFound()
             }
@@ -202,7 +204,7 @@ export const createPostComment = [
         try {
             const { id: postId } = req.params
             const { username, body } = req.body
-            const { id: userId } = req.user
+            const { id: userId } = req.user || {}
 
             const post = await postsService.getPostDetails(postId)
             if (!post) {
