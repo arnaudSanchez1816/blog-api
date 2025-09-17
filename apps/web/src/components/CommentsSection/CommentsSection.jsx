@@ -3,6 +3,9 @@ import Comment from "./Comment"
 import CommentSkeleton from "./CommentSkeleton"
 import CommentReplyForm from "./CommentReplyForm"
 import useData from "../../hooks/useData"
+import { useLocation } from "react-router"
+
+const commentsSectionId = "comments"
 
 function CommentsSectionWrapper({
     commentsCount,
@@ -11,7 +14,7 @@ function CommentsSectionWrapper({
     postId,
 }) {
     return (
-        <div id="comments">
+        <div id={commentsSectionId}>
             <h2 className="text-2xl font-medium">
                 {commentsCount > 0 && <span>{commentsCount} </span>}
                 Comments
@@ -23,6 +26,12 @@ function CommentsSectionWrapper({
 }
 
 export default function CommentsSection({ postId, commentsCount }) {
+    let fetchCommentsManually = true
+    const { hash } = useLocation()
+
+    if (hash && hash === `#${commentsSectionId}`) {
+        fetchCommentsManually = false
+    }
     const {
         data: comments,
         error,
@@ -30,7 +39,7 @@ export default function CommentsSection({ postId, commentsCount }) {
         triggerFetch,
     } = useData(`./posts/${postId}/comments`, {
         mode: "cors",
-        fetchManually: true,
+        fetchManually: fetchCommentsManually,
     })
 
     if (error) {
