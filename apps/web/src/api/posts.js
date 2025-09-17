@@ -17,7 +17,11 @@ export const getPublicPosts = async ({ page, pageSize }) => {
     let { results, ...dataJson } = await response.json()
 
     results = results.map((post) => {
-        return { ...post, readingTime: "3 min read" }
+        return {
+            ...post,
+            readingTime: "3 min read",
+            description: post.description || "Empty",
+        }
     })
 
     return {
@@ -46,5 +50,6 @@ export const getPublicPost = async (postId) => {
                 slug: "js",
             },
         ],
+        description: post.description || "Empty",
     }
 }

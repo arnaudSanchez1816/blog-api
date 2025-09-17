@@ -50,7 +50,8 @@ function ArrowRightIcon({
 }
 
 export default function PostItem({ post, className = "" }) {
-    const { id, title, body, readingTime, publishedAt, commentsCount } = post
+    const { id, title, description, readingTime, publishedAt, commentsCount } =
+        post
     const postHref = `/posts/${id}`
 
     return (
@@ -71,7 +72,7 @@ export default function PostItem({ post, className = "" }) {
                     <span>{readingTime}</span>
                 </div>
             </header>
-            <div className="my-4">{body}</div>
+            <div className="my-4">{description}</div>
             <Divider orientation="horizontal" className="my-4" />
             <footer>
                 <div className="flex justify-between">
