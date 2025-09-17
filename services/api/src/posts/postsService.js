@@ -1,4 +1,8 @@
 import { prisma } from "../config/prisma.js"
+import { JSDOM } from "jsdom"
+import DOMPurify from "dompurify"
+import { marked } from "marked"
+import { plainTextRenderer } from "../helpers/markedPlainTextRenderer.js"
 
 export const SortByValues = {
     publishedAtAsc: "+publishedAt",
@@ -88,6 +92,20 @@ export const createPost = async (title, authorId) => {
 }
 
 export const updatePost = async ({ postId, title, body }) => {
+    // https://github.com/ejrbuss/markdown-to-txt/blob/main/src/markdown-to-txt.ts
+    const plainBody = marked(body, {
+        renderer: plainTextRenderer,
+    })
+    const window = new JSDOM("").window
+    const purify = DOMPurify(window)
+    const sanitizedBody = purify.sanitize(plainBody)
+    // Get first 50 words from body to use as description
+    let description = sanitizedBody
+    const descrMatch = sanitizedBody.match(/(^(?:\S+\s*){1,50}).*/)
+    if (descrMatch) {
+        description = `${descrMatch[1]}...`
+    }
+
     const updatedPost = await prisma.post.update({
         where: {
             id: postId,
@@ -95,6 +113,7 @@ export const updatePost = async ({ postId, title, body }) => {
         data: {
             title: title,
             body: body,
+            description: description,
         },
     })
 

@@ -45,6 +45,7 @@ model Permission {
 model Post {
     id Int @id @default(autoincrement())
     title String
+    description String @default("")
     body String
     publishedAt DateTime? @db.Timestamptz @map("published_at") // Post is considered unpublished if publishedAt is null
     authorId Int @map("author_id")
