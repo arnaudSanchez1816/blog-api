@@ -17,18 +17,38 @@ export const getPosts = async ({
     pageSize = -1,
     publishedOnly = true,
     authorId = undefined,
+    tags = [],
 } = {}) => {
     page = Math.max(page, 1)
 
-    const queryOptions = {
-        where: {
-            ...(publishedOnly && {
-                publishedAt: {
-                    not: null,
+    const tagIds = tags.filter((t) => typeof t === "number")
+    const tagSlugs = tags.filter((t) => typeof t === "string")
+
+    const whereQuery = {
+        ...(publishedOnly && {
+            publishedAt: {
+                not: null,
+            },
+        }),
+        authorId,
+        ...(tags.length > 0 && {
+            tags: {
+                some: {
+                    OR: [
+                        {
+                            id: { in: tagIds },
+                        },
+                        {
+                            slug: { in: tagSlugs },
+                        },
+                    ],
                 },
-            }),
-            authorId,
-        },
+            },
+        }),
+    }
+
+    const queryOptions = {
+        where: whereQuery,
         orderBy: {
             ...((sortBy === SortByValues.publishedAtAsc ||
                 sortBy === SortByValues.publishedAtDesc) && {
@@ -46,6 +66,7 @@ export const getPosts = async ({
                     comments: true,
                 },
             },
+            tags: true,
         },
     }
 
@@ -57,14 +78,7 @@ export const getPosts = async ({
     let [posts, countPosts] = await prisma.$transaction([
         prisma.post.findMany(queryOptions),
         prisma.post.count({
-            where: {
-                ...(publishedOnly && {
-                    publishedAt: {
-                        not: null,
-                    },
-                }),
-                authorId,
-            },
+            where: whereQuery,
         }),
     ])
 

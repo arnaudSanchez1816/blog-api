@@ -1,4 +1,5 @@
 import { createCommentValidator } from "../comments/commentsValidators.js"
+import { tagSchema } from "../tags/tagsValidators.js"
 import { SortByValues } from "./postsService.js"
 import { z } from "zod"
 
@@ -12,6 +13,12 @@ export const getPublishedPostsValidator = z.object({
             .default(SortByValues.publishedAtDesc),
         page: z.coerce.number().int().min(0).optional().default(1),
         pageSize: z.coerce.number().int().min(1).max(50).optional().default(20),
+        tags: z
+            .string()
+            .transform((val) => val.split(","))
+            .pipe(z.array(z.union([tagSchema.shape.id, tagSchema.shape.slug])))
+            .optional()
+            .default([]),
     }),
 })
 

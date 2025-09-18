@@ -40,13 +40,14 @@ export const getPublishedPosts = [
     validateRequest(getPublishedPostsValidator),
     async (req, res, next) => {
         try {
-            const { page, pageSize, sortBy } = req.query
+            const { page, pageSize, sortBy, tags } = req.query
 
             const { posts, count } = await postsService.getPosts({
                 page,
                 pageSize,
                 sortBy,
                 publishedOnly: true,
+                tags,
             })
 
             const responseJson = {
@@ -55,6 +56,7 @@ export const getPublishedPosts = [
                     page: page,
                     pageSize: pageSize,
                     sortBy: sortBy,
+                    tags,
                 },
                 results: posts,
             }
