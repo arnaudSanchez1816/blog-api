@@ -1,15 +1,15 @@
-import { Button, Input, Link } from "@heroui/react"
+import { Button, Input } from "@heroui/react"
 import {
     Form,
     Outlet,
     useLoaderData,
+    useLocation,
     useMatches,
-    useNavigation,
     useSearchParams,
 } from "react-router"
 import SearchIcon from "../components/Icons/SearchIcon"
 import { getTags } from "../api/tags"
-import { useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef } from "react"
 import Tag from "../components/Tag"
 
 export async function asideLayoutLoader() {
@@ -21,7 +21,7 @@ export async function asideLayoutLoader() {
 export default function AsideLayout() {
     const { results: tags } = useLoaderData()
     const searchInputRef = useRef(null)
-    const navigation = useNavigation()
+    const location = useLocation()
     const [searchParams] = useSearchParams()
     const q = searchParams.get("q") || ""
 
@@ -33,7 +33,15 @@ export default function AsideLayout() {
         if (searchInputRef.current) {
             searchInputRef.current.value = q
         }
-    }, [navigation, q])
+    }, [q])
+
+    const onSearchSubmit = useCallback((e) => {
+        const { q } = Object.fromEntries(new FormData(e.target))
+
+        if (!q) {
+            e.preventDefault()
+        }
+    }, [])
 
     return (
         <div className="mx-auto pt-6 xl:grid xl:grid-cols-[1fr_minmax(auto,65ch)_1fr] xl:justify-center xl:gap-x-16">
@@ -52,6 +60,8 @@ export default function AsideLayout() {
                     className="flex flex-nowrap gap-4"
                     method="GET"
                     action="/search"
+                    onSubmit={onSearchSubmit}
+                    key={location.key}
                 >
                     <Input
                         classNames={{
