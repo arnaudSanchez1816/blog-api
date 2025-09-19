@@ -55,7 +55,7 @@ export default function AsideLayout() {
             <div className="m-auto mt-8 w-full max-w-prose xl:mt-0">
                 <Outlet />
             </div>
-            <aside className="mx-auto mt-12 max-w-prose xl:mx-0 xl:mt-0 xl:max-w-xs">
+            <aside className="mx-auto mt-24 max-w-prose xl:mx-0 xl:mt-0 xl:max-w-xs">
                 <Form
                     className="flex flex-nowrap gap-4"
                     method="GET"
