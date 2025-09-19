@@ -12,6 +12,7 @@ export const SortByValues = {
 }
 
 export const getPosts = async ({
+    q,
     sortBy = SortByValues.publishedAtDesc,
     page = 1,
     pageSize = -1,
@@ -26,6 +27,12 @@ export const getPosts = async ({
     const tagSlugs = tags.filter((t) => typeof t === "string")
 
     const whereQuery = {
+        ...(q && {
+            title: {
+                contains: q,
+                mode: "insensitive",
+            },
+        }),
         ...(publishedOnly && {
             publishedAt: {
                 not: null,

@@ -12,6 +12,7 @@ const postSchema = z.object({
 
 export const getPublishedPostsValidator = z.object({
     query: z.object({
+        q: z.string().optional(),
         sortBy: z
             .enum(Object.entries(SortByValues).map(([k, v]) => v))
             .optional()
