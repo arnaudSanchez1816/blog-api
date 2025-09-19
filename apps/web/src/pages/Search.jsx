@@ -1,8 +1,8 @@
-import { useLoaderData } from "react-router"
+import { useLoaderData, useNavigation } from "react-router"
 import { getPublicPosts } from "../api/posts"
 import PostItem from "../components/PostItem"
 import SadFaceIcon from "../components/Icons/SadFaceIcon"
-import { Pagination } from "@heroui/react"
+import { Pagination, Spinner } from "@heroui/react"
 import useTwBreakpoint from "../hooks/useTwBreakpoint"
 import usePageSearchParams from "../hooks/usePageSearchParams"
 
@@ -10,13 +10,13 @@ const pageSize = 10
 
 export const searchLoader = async ({ request }) => {
     const url = new URL(request.url)
-    const searchTerm = url.searchParams.get("q")
+    const q = url.searchParams.get("q")
     const tagTerm = url.searchParams.get("tag")
     const pageTerm = url.searchParams.get("page")
 
     const posts = await getPublicPosts({
-        name: searchTerm,
-        tag: tagTerm,
+        q: q,
+        tags: tagTerm,
         pageSize: pageSize,
         page: pageTerm,
     })
@@ -25,9 +25,19 @@ export const searchLoader = async ({ request }) => {
 }
 
 export default function Search() {
-    const { results: posts, count } = useLoaderData()
+    const navigation = useNavigation()
+    const { results: posts, metadata } = useLoaderData()
     const [currentPage, setCurrentPage] = usePageSearchParams()
     const isMd = useTwBreakpoint("md")
+    const { count } = metadata
+
+    if (navigation.state === "loading") {
+        return (
+            <div className="flex justify-center py-8">
+                <Spinner />
+            </div>
+        )
+    }
 
     let postsRender
 
@@ -47,7 +57,7 @@ export default function Search() {
     return (
         <>
             <div>{postsRender}</div>
-            {count >= pageSize && (
+            {count > pageSize && (
                 <div className="mt-8 flex justify-center">
                     <Pagination
                         showControls

@@ -1,10 +1,26 @@
-export const getPublicPosts = async ({ page, pageSize }) => {
+export const getPublicPosts = async ({ q, tags, page, pageSize }) => {
     const searchParams = new URLSearchParams()
     if (page) {
         searchParams.set("page", page)
     }
     if (pageSize) {
         searchParams.set("pageSize", pageSize)
+    }
+    if (q) {
+        searchParams.set("q", q)
+    }
+    if (tags) {
+        if (typeof tags === "string") {
+            tags = [tags]
+        }
+
+        if (!Array.isArray(tags)) {
+            throw new Error(
+                "Invalid tags parameter type, must be either string or array"
+            )
+        }
+
+        searchParams.set("tags", tags.join(","))
     }
     const apiUrl = import.meta.env.VITE_API_URL
     const url = new URL(`./posts?${searchParams}`, apiUrl)
