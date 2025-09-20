@@ -1,10 +1,12 @@
-import { useLoaderData, useNavigation } from "react-router"
+import { useLoaderData, useNavigation, useOutletContext } from "react-router"
 import { getPublicPosts } from "../api/posts"
 import PostItem from "../components/PostItem"
 import SadFaceIcon from "../components/Icons/SadFaceIcon"
 import { Pagination, Spinner } from "@heroui/react"
 import useTwBreakpoint from "../hooks/useTwBreakpoint"
-import usePageSearchParams from "../hooks/usePageSearchParams"
+import { useEffect } from "react"
+import SortByButton from "../components/SortByButton"
+import useParamSearchParams from "../hooks/useParamSearchParams"
 
 const pageSize = 10
 
@@ -13,12 +15,14 @@ export const searchLoader = async ({ request }) => {
     const q = url.searchParams.get("q")
     const tagTerm = url.searchParams.get("tag")
     const pageTerm = url.searchParams.get("page")
+    const sortBy = url.searchParams.get("sortBy")
 
     const posts = await getPublicPosts({
         q: q,
         tags: tagTerm,
         pageSize: pageSize,
         page: pageTerm,
+        sortBy,
     })
 
     return posts
@@ -27,9 +31,17 @@ export const searchLoader = async ({ request }) => {
 export default function Search() {
     const navigation = useNavigation()
     const { results: posts, metadata } = useLoaderData()
-    const [currentPage, setCurrentPage] = usePageSearchParams()
+    const [currentPageString, setCurrentPage] = useParamSearchParams("page", 1)
     const isMd = useTwBreakpoint("md")
     const { count } = metadata
+    const [leftContent, setLeftContent] = useOutletContext()
+
+    const currentPage = Number(currentPageString)
+
+    useEffect(() => {
+        setLeftContent(<SortByButton />)
+        return () => setLeftContent(undefined)
+    }, [setLeftContent])
 
     if (navigation.state === "loading") {
         return (

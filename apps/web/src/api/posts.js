@@ -1,4 +1,4 @@
-export const getPublicPosts = async ({ q, tags, page, pageSize }) => {
+export const getPublicPosts = async ({ q, tags, page, pageSize, sortBy }) => {
     const searchParams = new URLSearchParams()
     if (page) {
         searchParams.set("page", page)
@@ -8,6 +8,9 @@ export const getPublicPosts = async ({ q, tags, page, pageSize }) => {
     }
     if (q) {
         searchParams.set("q", q)
+    }
+    if (sortBy) {
+        searchParams.set("sortBy", sortBy)
     }
     if (tags) {
         if (typeof tags === "string") {

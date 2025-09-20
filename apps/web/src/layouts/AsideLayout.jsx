@@ -9,7 +9,7 @@ import {
 } from "react-router"
 import SearchIcon from "../components/Icons/SearchIcon"
 import { getTags } from "../api/tags"
-import { useCallback, useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import Tag from "../components/Tag"
 
 export async function asideLayoutLoader() {
@@ -24,6 +24,7 @@ export default function AsideLayout() {
     const location = useLocation()
     const [searchParams] = useSearchParams()
     const q = searchParams.get("q") || ""
+    const [leftContent, setLeftContent] = useState(undefined)
 
     const matches = useMatches()
     let title = matches.filter((match) => Boolean(match.handle?.title))[0]
@@ -51,9 +52,10 @@ export default function AsideLayout() {
                         {title}
                     </h1>
                 )}
+                {leftContent && <>{leftContent}</>}
             </div>
             <div className="m-auto mt-8 w-full max-w-prose xl:mt-0">
-                <Outlet />
+                <Outlet context={[leftContent, setLeftContent]} />
             </div>
             <aside className="mx-auto mt-24 max-w-prose xl:mx-0 xl:mt-0 xl:max-w-xs">
                 <Form

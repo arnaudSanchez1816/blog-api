@@ -3,33 +3,33 @@ import { useSearchParams } from "react-router"
 
 /**
  *
- * @callback SetCurrentPage
- * @param {Number} newPage - An integer.
+ * @callback SetParam
+ * @param {any} newValue
  */
 
 /**
  *
- * @returns {[currentPage: Number, setCurrentPage: SetCurrentPage]}
+ * @returns {[param: any, setParam: SetParam]}
  */
-export default function usePageSearchParams() {
+export default function useParamSearchParams(paramName, defaultValue) {
     const [searchParams, setSearchParams] = useSearchParams()
 
-    const currentPage = Number(searchParams.get("page")) || 1
+    const param = searchParams.get(paramName) || defaultValue
 
-    const setCurrentPage = useCallback(
-        (newPage) => {
+    const setParam = useCallback(
+        (newValue) => {
             setSearchParams(
                 (previousParams) => {
                     const newParams = new URLSearchParams(previousParams)
-                    newParams.set("page", newPage)
+                    newParams.set(paramName, newValue)
 
                     return newParams
                 },
                 { replace: true }
             )
         },
-        [setSearchParams]
+        [setSearchParams, paramName]
     )
 
-    return [currentPage, setCurrentPage]
+    return [param, setParam]
 }

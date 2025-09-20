@@ -1,18 +1,22 @@
 import { Pagination } from "@heroui/react"
-import { useLoaderData } from "react-router"
+import { useLoaderData, useOutletContext } from "react-router"
 import PostItem from "../components/PostItem"
 import { getPublicPosts } from "../api/posts"
 import useTwBreakpoint from "../hooks/useTwBreakpoint"
 import SadFaceIcon from "../components/Icons/SadFaceIcon"
-import usePageSearchParams from "../hooks/usePageSearchParams"
+import { useEffect } from "react"
+import useParamSearchParams from "../hooks/useParamSearchParams"
+import SortByButton from "../components/SortByButton"
 
 export const postsLoader = async ({ request }) => {
     const url = new URL(request.url)
     const pageTerm = url.searchParams.get("page")
     const pageSizeTerm = url.searchParams.get("pageSize")
+    const sortBy = url.searchParams.get("sortBy")
     const posts = await getPublicPosts({
         page: pageTerm,
         pageSize: pageSizeTerm,
+        sortBy,
     })
 
     return posts
@@ -21,7 +25,15 @@ export const postsLoader = async ({ request }) => {
 export default function Posts() {
     const { metadata, results: posts } = useLoaderData()
     const { count, pageSize } = metadata
-    const [currentPage, setCurrentPage] = usePageSearchParams()
+    const [currentPageString, setCurrentPage] = useParamSearchParams("page", 1)
+    const [leftContent, setLeftContent] = useOutletContext()
+
+    const currentPage = Number(currentPageString)
+
+    useEffect(() => {
+        setLeftContent(<SortByButton />)
+        return () => setLeftContent(undefined)
+    }, [setLeftContent])
 
     const isMd = useTwBreakpoint("md")
 
