@@ -1,9 +1,10 @@
 import { z } from "zod"
+import { userSchema } from "@repo/zod-schemas"
 
 const loginValidator = z.object({
-    body: z.object({
-        email: z.email(),
-        password: z.string(),
+    body: userSchema.pick({
+        email: true,
+        password: true,
     }),
 })
 
