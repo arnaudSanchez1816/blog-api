@@ -6,13 +6,6 @@ export const commentSchema = z.object({
     body: z.string().trim(),
 })
 
-export const postSchema = z.object({
-    id: z.coerce.number().int().min(1),
-    title: z.string().trim().min(1),
-    body: z.string(),
-    tags: z.array(z.union([tagSchema.shape.id, tagSchema.shape.slug])),
-})
-
 export const tagSchema = z.object({
     id: z.coerce.number().int().min(1),
     name: z.string().max(30),
@@ -20,6 +13,13 @@ export const tagSchema = z.object({
         .string()
         .max(30)
         .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+})
+
+export const postSchema = z.object({
+    id: z.coerce.number().int().min(1),
+    title: z.string().trim().min(1),
+    body: z.string(),
+    tags: z.array(z.union([tagSchema.shape.id, tagSchema.shape.slug])),
 })
 
 export const userSchema = z.object({
