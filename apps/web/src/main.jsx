@@ -9,7 +9,7 @@ import { RouterProvider } from "react-router/dom"
 import "./style.css"
 import App from "./App"
 import Home, { homeLoader } from "./pages/Home"
-import About from "./pages/About"
+import About, { aboutLoader } from "./pages/About"
 import Posts, { postsLoader } from "./pages/Posts"
 import PostPage, { postPageLoader } from "./pages/Post"
 import AsideLayout, { asideLayoutLoader } from "./layouts/AsideLayout"
@@ -62,7 +62,7 @@ const router = createBrowserRouter(
                         />
                     </Route>
                 </Route>
-                <Route path="/about" element={<About />} />
+                <Route path="/about" element={<About />} loader={aboutLoader} />
             </Route>
         </Route>
     )
