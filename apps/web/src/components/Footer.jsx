@@ -78,7 +78,7 @@ export default function Footer() {
                         </h2>
                         <div className="flex grow gap-2">
                             <Button
-                                href="https://www.linkedin.com/"
+                                href="https://linkedin.com/in/arnaud-sanchez-b6ba21277"
                                 className="rounded-full"
                                 color="default"
                                 isIconOnly
