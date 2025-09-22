@@ -11,7 +11,7 @@ import {
 import { useEffect, useRef, useState } from "react"
 import { useLocation } from "react-router"
 import NavLink from "./NavLink"
-import ThemeSwitcher from "./ThemeSwitcher"
+import ThemeSwitcher from "@repo/ui/components/ThemeSwitcher"
 
 function BlogLogo({ ...props }) {
     return (
