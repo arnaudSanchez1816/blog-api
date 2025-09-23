@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client"
 import {
     createBrowserRouter,
     createRoutesFromElements,
+    data,
     Route,
 } from "react-router"
 import { RouterProvider } from "react-router/dom"
@@ -64,6 +65,13 @@ const router = createBrowserRouter(
                 </Route>
                 <Route path="/about" element={<About />} loader={aboutLoader} />
             </Route>
+            <Route
+                path="/*"
+                ErrorBoundary={ErrorPage}
+                loader={() => {
+                    throw data("Page not found", 404)
+                }}
+            />
         </Route>
     )
 )
