@@ -4,3 +4,9 @@ export class AlreadyExistsError extends Error {
         this.field = { name, value }
     }
 }
+
+export class AuthenticationError extends Error {
+    constructor(message) {
+        super(message)
+    }
+}

@@ -4,6 +4,7 @@ import { Strategy as LocalStrategy } from "passport-local"
 import { Strategy as AnonymousStrategy } from "passport-anonymous"
 import bcrypt from "bcryptjs"
 import userService from "../users/usersService.js"
+import { AuthenticationError } from "../helpers/errors.js"
 
 const jwtStrategy = new JwtStrategy(
     {
@@ -38,9 +39,10 @@ const localStrategy = new LocalStrategy(
         try {
             const user = await userService.getUserByEmail(username)
             if (!user) {
-                return done(null, false, {
-                    message: LOCAL_AUTH_ERROR_MESSAGE,
-                })
+                return done(
+                    new AuthenticationError(LOCAL_AUTH_ERROR_MESSAGE),
+                    false
+                )
             }
 
             const passwordAreMatching = await bcrypt.compare(
@@ -48,9 +50,10 @@ const localStrategy = new LocalStrategy(
                 user.password
             )
             if (!passwordAreMatching) {
-                return done(null, false, {
-                    message: LOCAL_AUTH_ERROR_MESSAGE,
-                })
+                return done(
+                    new AuthenticationError(LOCAL_AUTH_ERROR_MESSAGE),
+                    false
+                )
             }
 
             return done(null, user)
