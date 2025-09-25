@@ -6,27 +6,49 @@ import bcrypt from "bcryptjs"
 import userService from "../users/usersService.js"
 import { AuthenticationError } from "../helpers/errors.js"
 
+const checkJwtUser = async (jwtPayload, done) => {
+    try {
+        const user = await userService.getUserById(jwtPayload.sub)
+
+        if (!user) {
+            return done(null, false)
+        }
+
+        return done(null, user)
+    } catch (error) {
+        done(error, false)
+    }
+}
+
 const jwtStrategy = new JwtStrategy(
     {
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-        secretOrKey: process.env.JWT_SECRET,
+        secretOrKey: process.env.JWT_ACCESS_SECRET,
         algorithms: ["HS256"],
     },
-    async (jwtPayload, done) => {
-        try {
-            const user = await userService.getUserById(jwtPayload.sub)
-
-            if (!user) {
-                return done(null, false)
-            }
-
-            return done(null, user)
-        } catch (error) {
-            done(error, false)
-        }
-    }
+    checkJwtUser
 )
 passport.use(jwtStrategy)
+
+export const REFRESH_TOKEN_COOKIE = "__Http-refreshToken"
+const jwtRefreshStrategy = new JwtStrategy(
+    {
+        jwtFromRequest: ExtractJwt.fromExtractors([
+            (req) => {
+                const refreshToken = req.signedCookies[REFRESH_TOKEN_COOKIE]
+                if (!refreshToken) {
+                    return null
+                }
+                return refreshToken
+            },
+        ]),
+        secretOrKey: process.env.JWT_REFRESH_SECRET,
+        algorithms: ["HS256"],
+    },
+    checkJwtUser
+)
+jwtRefreshStrategy.name = "jwt-refresh"
+passport.use(jwtRefreshStrategy)
 
 const LOCAL_AUTH_ERROR_MESSAGE = "Invalid e-mail/password"
 const localStrategy = new LocalStrategy(
@@ -70,6 +92,7 @@ passport.use(anonymousStrategy)
 export const strategies = {
     local: localStrategy.name,
     jwt: jwtStrategy.name,
+    jwtRefresh: jwtRefreshStrategy.name,
     anonymous: anonymousStrategy.name,
 }
 

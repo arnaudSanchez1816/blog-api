@@ -24,7 +24,7 @@ app.disable("x-powered-by")
 app.use(helmet())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
-app.use(cookieParser())
+app.use(cookieParser(process.env.SIGNED_COOKIE_SECRET))
 app.use(cors({ origin: process.env.CORS_ORIGIN_URL.split(",") }))
 // Passport
 app.use(passport.initialize())
