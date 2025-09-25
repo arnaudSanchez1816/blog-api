@@ -1,11 +1,25 @@
 import { createContext, useCallback, useMemo, useState } from "react"
 import { useNavigate } from "react-router"
 
+/**
+ * @callback loginCallback
+ * @param {string} email - email of user
+ * @param {string} password - password of user
+ * @returns {Promise<{accessToken : string?, error : string?}>} - Result
+ */
+
+/**
+ * @typedef {object} AuthContextType
+ * @property {object} AuthContextType.user
+ * @property {loginCallback} AuthContextType.login
+ * @property {() => void} AuthContextType.logoff
+ */
+
+/** @type {AuthContextType} */
 export const AuthContext = createContext({
     user: null,
-    // eslint-disable-next-line
-    login: ({ email, password }) => {},
-    logoff: () => {},
+    login: null,
+    logoff: null,
 })
 
 export const AuthProvider = ({ children }) => {
