@@ -75,7 +75,9 @@ export const getPosts = async ({
                 },
             },
             tags: true,
-            body: includeBody,
+        },
+        omit: {
+            body: !includeBody,
         },
     }
 

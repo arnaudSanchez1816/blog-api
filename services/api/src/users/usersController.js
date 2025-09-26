@@ -24,6 +24,7 @@ export const getCurrentUserPosts = async (req, res, next) => {
             sortBy: SortByValues.idDesc,
             publishedOnly: false,
             authorId: userId,
+            includeBody: false,
         })
 
         const responseJson = {
