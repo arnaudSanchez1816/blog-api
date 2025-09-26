@@ -1,7 +1,7 @@
 import { Pagination } from "@heroui/react"
 import SadFaceIcon from "@repo/ui/components/Icons/SadFaceIcon"
 import PostItem from "./PostItem"
-import useTwBreakpoint from "../../hooks/useTwBreakpoint"
+import useTwBreakpoint from "@repo/ui/hooks/useTwBreakpoint"
 
 export default function PostsList({
     posts,

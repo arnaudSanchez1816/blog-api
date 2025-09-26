@@ -3,10 +3,10 @@ import { getPublicPosts } from "../api/posts"
 import PostItem from "../components/Posts/PostItem"
 import SadFaceIcon from "@repo/ui/components/Icons/SadFaceIcon"
 import { Pagination, Spinner } from "@heroui/react"
-import useTwBreakpoint from "../hooks/useTwBreakpoint"
 import { useEffect } from "react"
 import SortByButton from "../components/SortByButton"
 import useParamSearchParams from "../hooks/useParamSearchParams"
+import useTwBreakpoint from "@repo/ui/hooks/useTwBreakpoint"
 
 const pageSize = 10
 
