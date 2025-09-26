@@ -92,10 +92,9 @@ export default function Header({ title = "Blog-API", navItems = [] }) {
                 <ThemeSwitcher />
             </NavbarContent>
             <NavbarMenu portalContainer={rootRef.current}>
-                <NavbarMenuItem>
-                    {navItems.map((item) => (
+                {navItems.map((item) => (
+                    <NavbarMenuItem key={item.href}>
                         <NavLink
-                            key={item.href}
                             color="foreground"
                             href={item.href}
                             size="lg"
@@ -103,8 +102,8 @@ export default function Header({ title = "Blog-API", navItems = [] }) {
                         >
                             {item.name}
                         </NavLink>
-                    ))}
-                </NavbarMenuItem>
+                    </NavbarMenuItem>
+                ))}
             </NavbarMenu>
         </Navbar>
     )
