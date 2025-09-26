@@ -1,5 +1,6 @@
 import { Button } from "@heroui/react"
 import useTheme from "../hooks/useTheme"
+import useTwBreakpoint from "../hooks/useTwBreakpoint"
 
 function MoonIcon({ size = 24, height, width, ...props }) {
     return (
@@ -31,6 +32,7 @@ function SunIcon({ size = 24, height, width, ...props }) {
 
 export default function ThemeSwitcher() {
     const [theme, setTheme] = useTheme()
+    const isSm = useTwBreakpoint("sm")
 
     return (
         <div>
@@ -40,9 +42,10 @@ export default function ThemeSwitcher() {
                 onPress={() => setTheme("light")}
                 radius="full"
                 variant="bordered"
+                size={isSm ? "md" : "sm"}
                 className={`items-center justify-center ${theme === "dark" ? "flex" : "hidden"}`}
             >
-                <SunIcon className="fill-current" width={24} />
+                <SunIcon className="h-4 w-4 fill-current sm:h-6 sm:w-6" />
             </Button>
             <Button
                 isIconOnly
@@ -50,9 +53,10 @@ export default function ThemeSwitcher() {
                 onPress={() => setTheme("dark")}
                 radius="full"
                 variant="bordered"
+                size={isSm ? "md" : "sm"}
                 className={`items-center justify-center ${theme === "light" ? "flex" : "hidden"}`}
             >
-                <MoonIcon className="fill-current" width={24} />
+                <MoonIcon className="h-4 w-4 fill-current sm:h-6 sm:w-6" />
             </Button>
         </div>
     )
