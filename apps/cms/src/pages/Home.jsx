@@ -1,27 +1,32 @@
 import NavLink from "@repo/ui/components/NavLink"
 import useAuth from "../hooks/useAuth/useAuth"
 import { authFetch } from "../helpers/authFetch"
-import { useLoaderData } from "react-router"
+import { redirect, useLoaderData } from "react-router"
+import { AuthException } from "../helpers/authException"
 
 export const homeLoader = async (token) => {
-    const url = new URL("./users/me/posts", import.meta.env.VITE_API_URL)
-    const searchParams = new URLSearchParams()
-    searchParams.set("pageSize", 3)
-    searchParams.set("sortBy", "-id")
-    const response = await authFetch(`${url}?${searchParams}`, token, {
-        mode: "cors",
-        method: "get",
-    })
+    try {
+        const url = new URL("./users/me/posts", import.meta.env.VITE_API_URL)
+        const searchParams = new URLSearchParams()
+        searchParams.set("pageSize", 3)
+        searchParams.set("sortBy", "-id")
+        const response = await authFetch(`${url}?${searchParams}`, token, {
+            mode: "cors",
+            method: "get",
+        })
 
-    if (!response.ok) {
-        throw response
-    }
+        if (!response.ok) {
+            throw response
+        }
 
-    const data = await response.json()
+        const data = await response.json()
 
-    return {
-        posts: data.results,
-        total: data.metadata.count,
+        return {
+            posts: data.results,
+            total: data.metadata.count,
+        }
+    } catch {
+        throw redirect("/login")
     }
 }
 

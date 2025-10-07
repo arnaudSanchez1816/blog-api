@@ -1,3 +1,5 @@
+import { AuthException } from "./authException"
+
 /**
  *
  * @param {RequestInfo | URL} path
@@ -7,7 +9,7 @@
  */
 export const authFetch = async (path, token, options) => {
     if (!token) {
-        throw new Error("Invalid auth token")
+        throw new AuthException("Invalid auth token")
     }
     let { headers } = options || {}
     headers = { ...headers, Authorization: `Bearer ${token}` }
