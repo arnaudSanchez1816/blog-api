@@ -1,5 +1,5 @@
 import { Link } from "@heroui/react"
-import useParamSearchParams from "../hooks/useParamSearchParams"
+import useParamSearchParams from "@repo/ui/hooks/useParamSearchParams"
 
 export default function SortByButton() {
     const [sortBy, setSortBy] = useParamSearchParams("sortBy", "-publishedAt")
