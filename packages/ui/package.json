@@ -6,6 +6,7 @@
   "exports": {
     "./components/*": "./src/components/*.jsx",
     "./components/icons/*": "./src/components/icons/*.jsx",
+    "./components/PostsList/*": "./src/components/PostsList/*.jsx",
     "./hooks/*": "./src/hooks/*.js",
     "./style.css": "./src/style.css"
   },
