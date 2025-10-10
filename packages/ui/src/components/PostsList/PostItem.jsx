@@ -63,11 +63,19 @@ export default function PostItem({ post, className = "", isLoaded = true }) {
                     </h1>
                 </Link>
                 <div className="text-foreground/70 mt-2 flex gap-2">
-                    <Link color="primary" underline="always" href={postHref}>
-                        <time dateTime="2025-01-01">
-                            {format(publishedAt, "MMMM dd, y")}
-                        </time>
-                    </Link>
+                    {publishedAt ? (
+                        <Link
+                            color="primary"
+                            underline="always"
+                            href={postHref}
+                        >
+                            <time dateTime="2025-01-01">
+                                {format(publishedAt, "MMMM dd, y")}
+                            </time>
+                        </Link>
+                    ) : (
+                        <p className="text-warning">Unpublished</p>
+                    )}
                     <span>•</span>
                     <span>{`${readingTime} min read`}</span>
                 </div>
