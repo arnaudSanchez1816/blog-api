@@ -13,12 +13,8 @@ const headerNavItems = [
         href: "/",
     },
     {
-        name: "All Posts",
+        name: "Posts",
         href: "/posts",
-    },
-    {
-        name: "My posts",
-        href: "/my-posts",
     },
     {
         name: "Tags",
