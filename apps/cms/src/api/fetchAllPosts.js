@@ -34,6 +34,7 @@ export const fetchAllPosts = async ({
 
         searchParams.set("tags", tags.join(","))
     }
+    searchParams.set("unpublished", "")
     const apiUrl = import.meta.env.VITE_API_URL
     const url = new URL(`./posts?${searchParams}`, apiUrl)
     const response = await authFetch(url, accessToken, {
