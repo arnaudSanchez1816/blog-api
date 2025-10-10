@@ -3,10 +3,15 @@ import SadFaceIcon from "@repo/ui/components/Icons/SadFaceIcon"
 import PostItem from "./PostItem"
 import useTwBreakpoint from "@repo/ui/hooks/useTwBreakpoint"
 
+function defaultRenderItem(post) {
+    return <PostItem post={post} key={post.id} className="[&+*]:mt-12" />
+}
+
 export default function PostsList({
     posts,
     pagination,
     pagination: { currentPage, setCurrentPage, count, pageSize } = {},
+    renderItem = defaultRenderItem,
 }) {
     const isMd = useTwBreakpoint("md")
     const totalPages = pagination
@@ -17,13 +22,7 @@ export default function PostsList({
         <>
             <div>
                 {posts.length > 0 ? (
-                    posts.map((post) => (
-                        <PostItem
-                            post={post}
-                            key={post.id}
-                            className="[&+*]:mt-12"
-                        />
-                    ))
+                    posts.map((post) => renderItem(post))
                 ) : (
                     <div className="my-4 flex flex-col gap-4">
                         <SadFaceIcon
