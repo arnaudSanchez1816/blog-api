@@ -54,6 +54,9 @@ function Root() {
                                     <Route
                                         path="/posts"
                                         element={<AllPosts />}
+                                        handle={{
+                                            title: "All posts",
+                                        }}
                                     ></Route>
                                 </Route>
                             </Route>

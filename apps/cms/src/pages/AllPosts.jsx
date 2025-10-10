@@ -1,11 +1,13 @@
-import { useSearchParams } from "react-router"
+import { useOutletContext, useSearchParams } from "react-router"
 import useQuery from "../hooks/useQuery"
 import PostsListSkeleton from "@repo/ui/components/PostsList/PostsListSkeleton"
 import PostsList from "@repo/ui/components/PostsList/PostsList"
 import useParamSearchParams from "@repo/ui/hooks/useParamSearchParams"
 import { fetchAllPosts } from "../api/fetchAllPosts"
 import useAuth from "../hooks/useAuth/useAuth"
-import { useCallback } from "react"
+import { useCallback, useEffect } from "react"
+import SearchParamsToggle from "@repo/ui/components/SearchParamsToggle"
+import SearchParamsSelect from "@repo/ui/components/SearchParamsSelect"
 
 const DEFAULT_PAGE_SIZE = 10
 
@@ -13,7 +15,15 @@ async function allPostsQuery({ accessToken, searchParams }) {
     const page = searchParams.get("page")
     const pageSize = searchParams.get("pageSize") || DEFAULT_PAGE_SIZE
     const sortBy = searchParams.get("sortBy")
-    return fetchAllPosts({ accessToken, page, pageSize, sortBy })
+    const showUnpublished = searchParams.get("unpublished") === "true"
+
+    return fetchAllPosts({
+        accessToken,
+        page,
+        pageSize,
+        sortBy,
+        showUnpublished,
+    })
 }
 
 export default function AllPosts() {
@@ -30,6 +40,37 @@ export default function AllPosts() {
     })
     const [currentPageString, setCurrentPage] = useParamSearchParams("page", 1)
     const currentPage = Number(currentPageString)
+
+    const [leftContent, setLeftContent] = useOutletContext()
+
+    useEffect(() => {
+        setLeftContent(
+            <>
+                <div className="mt-4">
+                    <p className="text-lg font-medium">Filters</p>
+                    <div className="flex flex-col gap-2">
+                        <SearchParamsSelect
+                            paramName="sortBy"
+                            items={[
+                                { key: "-publishedAt", label: "↓ published" },
+                                { key: "publishedAt", label: "↑ published" },
+                                { key: "-id", label: "↓ creation" },
+                                { key: "id", label: "↑ creation" },
+                            ]}
+                            defaultValue="-publishedAt"
+                        />
+                        <SearchParamsToggle
+                            onValue={"true"}
+                            offValue={"false"}
+                            defaultState={false}
+                            paramName={"unpublished"}
+                        />
+                    </div>
+                </div>
+            </>
+        )
+        return () => setLeftContent(undefined)
+    }, [setLeftContent])
 
     if (isLoading) {
         return <PostsListSkeleton nbPosts={10} />
