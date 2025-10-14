@@ -18,6 +18,7 @@ import Home, { homeLoader } from "./pages/Home"
 import { AuthProvider } from "./hooks/useAuth/AuthProvider"
 import useAuth from "./hooks/useAuth/useAuth"
 import AllPosts from "./pages/AllPosts"
+import Post, { postLoader } from "./pages/Post"
 
 function Root() {
     const { accessToken, user, logout } = useAuth()
@@ -51,13 +52,20 @@ function Root() {
                                         element={<Home />}
                                         loader={() => homeLoader(accessToken)}
                                     ></Route>
-                                    <Route
-                                        path="/posts"
-                                        element={<AllPosts />}
-                                        handle={{
-                                            title: "All posts",
-                                        }}
-                                    ></Route>
+                                    <Route path="/posts">
+                                        <Route
+                                            index
+                                            element={<AllPosts />}
+                                            handle={{
+                                                title: "All posts",
+                                            }}
+                                        />
+                                        <Route
+                                            path=":postId"
+                                            element={<Post />}
+                                            loader={postLoader}
+                                        />
+                                    </Route>
                                 </Route>
                             </Route>
                             <Route path="/login" element={<Login />}></Route>
