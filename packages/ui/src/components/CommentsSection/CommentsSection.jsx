@@ -20,7 +20,7 @@ function CommentsSectionWrapper({
         <div id={commentsSectionId}>
             <h2 className="text-2xl font-medium">
                 {commentsCount > 0 && <span>{commentsCount} </span>}
-                Comments
+                {commentsCount === 1 ? "Comment" : "Comments"}
             </h2>
             <div className="mt-8 flex flex-col gap-12">{children}</div>
             <CommentReplyForm fetchComments={fetchComments} postId={postId} />
