@@ -47,9 +47,8 @@ export default function Home() {
                     <div className="mt-2 font-bold">{user.name}</div>
                 </h1>
             </div>
-            <div className="mt-8 flex flex-col gap-2">
+            <div className="mt-4 flex flex-col gap-2">
                 <NavLink href="/posts">View all posts</NavLink>
-                <NavLink href="/my-posts">View my posts</NavLink>
                 <NavLink href="/tags">Manage tags</NavLink>
             </div>
             <div className="mt-8">
