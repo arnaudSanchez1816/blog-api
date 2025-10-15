@@ -115,7 +115,7 @@ export const createPost = async (title, authorId) => {
     const createdPost = await prisma.post.create({
         data: {
             title: title,
-            body: `# ${title}`,
+            body: `New blog post`,
             authorId: authorId,
         },
     })
