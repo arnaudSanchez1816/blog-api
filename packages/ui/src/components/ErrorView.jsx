@@ -6,12 +6,17 @@ export default function ErrorView() {
 
     if (isRouteErrorResponse(error)) {
         console.dir(error)
+        const errorData = error.data
         return (
             <div className="flex h-full min-h-[50vh] flex-col items-center justify-center gap-4">
                 <h1 className="text-danger text-7xl font-medium">
                     {error.status}
                 </h1>
-                <p className="text-danger-700">{error.statusText}</p>
+                <p className="text-danger-700">
+                    {typeof errorData === "string"
+                        ? errorData
+                        : error.statusText}
+                </p>
             </div>
         )
     }

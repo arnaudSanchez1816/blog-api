@@ -16,7 +16,7 @@ export const postPageLoader = async ({ params }) => {
     } catch (error) {
         console.error(error)
 
-        return data("Post not found", 404)
+        throw data("Post not found", 404)
     }
 }
 
