@@ -16,19 +16,19 @@ import { useCallback, useEffect, useState } from "react"
 /**
  *
  * @param {UseDataOptions} token
- * @returns
+ * @returns {[data: any, loading: boolean, error:any, triggerFetch : function]}
  */
 export default function useQuery({ queryFn, queryKey, enabled = true }) {
     const [data, setData] = useState(undefined)
     const [error, setError] = useState(undefined)
-    const [loading, setLoading] = useState(false)
     const [fetchData, setFetchData] = useState(enabled)
+    const [loading, setLoading] = useState(fetchData)
     useEffect(() => {
         let ignore = false
 
         if (fetchData) {
             const doFetch = async () => {
-                setLoading(false)
+                setLoading(true)
 
                 try {
                     const result = await queryFn()
