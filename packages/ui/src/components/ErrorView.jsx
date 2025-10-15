@@ -2,6 +2,7 @@ import { isRouteErrorResponse, useRouteError } from "react-router"
 
 export default function ErrorView() {
     const error = useRouteError()
+    const devMode = import.meta.env.DEV
 
     if (isRouteErrorResponse(error)) {
         console.dir(error)
@@ -10,9 +11,7 @@ export default function ErrorView() {
                 <h1 className="text-danger text-7xl font-medium">
                     {error.status}
                 </h1>
-                <p className="text-danger-700">
-                    {error.data || error.statusText}
-                </p>
+                <p className="text-danger-700">{error.statusText}</p>
             </div>
         )
     }
@@ -24,7 +23,7 @@ export default function ErrorView() {
                     Something went wrong
                 </h1>
                 <p className="text-danger-700">{error.message}</p>
-                <pre>{error.stack}</pre>
+                {devMode && <pre>{error.stack}</pre>}
             </div>
         )
     }
