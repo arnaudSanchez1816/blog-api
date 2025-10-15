@@ -301,6 +301,9 @@ importers:
         specifier: ^4.1.5
         version: 4.1.5
     devDependencies:
+      '@repo/auth-provider':
+        specifier: workspace:*
+        version: link:../auth-provider
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config

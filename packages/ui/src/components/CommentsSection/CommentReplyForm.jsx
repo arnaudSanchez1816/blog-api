@@ -1,4 +1,5 @@
-import { addToast, Button, Form, Input, Textarea } from "@heroui/react"
+import { addToast, Button, Form, Input, Textarea, User } from "@heroui/react"
+import useAuth from "@repo/auth-provider/useAuth"
 import { useState } from "react"
 
 const postComment = async ({ postId, username, commentBody }) => {
@@ -24,6 +25,7 @@ const postComment = async ({ postId, username, commentBody }) => {
 }
 
 export default function CommentReplyForm({ postId, fetchComments }) {
+    const { user } = useAuth()
     const [submitting, setSubmitting] = useState(false)
 
     const handleSubmit = async (e) => {
@@ -73,14 +75,33 @@ export default function CommentReplyForm({ postId, fetchComments }) {
             <h3 className="text-xl font-medium">Reply</h3>
             <p className="text-danger text-sm">* indicate a required field</p>
             <Form onSubmit={handleSubmit}>
-                <Input
-                    type="text"
-                    isRequired
-                    name="username"
-                    label="Username"
-                    labelPlacement="outside-top"
-                    variant="faded"
-                />
+                {user ? (
+                    <>
+                        <User
+                            avatarProps={{
+                                showFallback: true,
+                                name: user.name,
+                            }}
+                            name={user.name}
+                            description={<p>{user.email}</p>}
+                            classNames={{ name: "font-medium" }}
+                        />
+                        <Input
+                            type="hidden"
+                            name="username"
+                            value={user.name}
+                        />
+                    </>
+                ) : (
+                    <Input
+                        type="text"
+                        isRequired
+                        name="username"
+                        label="Username"
+                        labelPlacement="outside-top"
+                        variant="faded"
+                    />
+                )}
                 <Textarea
                     label="Message"
                     labelPlacement="outside"
