@@ -1,29 +1,26 @@
 import { Button, Form, Input } from "@heroui/react"
-import { useRef, useState } from "react"
+import { useState } from "react"
 import ThreeColumnLayout from "../layouts/ThreeColumnLayout"
 import { Navigate, useNavigate } from "react-router"
 import useAuth from "@repo/auth-provider/useAuth"
 
 export default function Login() {
     const navigate = useNavigate()
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+
     const [isLoading, setIsLoading] = useState(false)
-    const [errors, setErrors] = useState(undefined)
+    const [errors, setErrors] = useState(null)
     const { user, login } = useAuth()
-    const formRef = useRef(null)
     const onLoginSubmit = async (e) => {
         e.preventDefault()
 
-        const { email, password } = Object.fromEntries(
-            new FormData(formRef.current)
-        )
         setIsLoading(true)
-        setErrors(undefined)
+        setErrors(null)
         const { error } = await login({ email, password })
         setIsLoading(false)
         setErrors(error)
-        if (formRef.current) {
-            formRef.current.reset()
-        }
+        setPassword("")
         if (!error) {
             await navigate("/")
         }
@@ -43,7 +40,6 @@ export default function Login() {
             center={
                 <div>
                     <Form
-                        ref={formRef}
                         onSubmit={onLoginSubmit}
                         validationErrors={errors}
                         className="flex flex-col gap-4"
@@ -55,6 +51,8 @@ export default function Login() {
                             labelPlacement="outside-top"
                             isRequired
                             isDisabled={isLoading}
+                            value={email}
+                            onChange={(e) => setEmail(e.currentTarget.value)}
                         />
                         <Input
                             type="password"
@@ -63,6 +61,8 @@ export default function Login() {
                             labelPlacement="outside-top"
                             isRequired
                             isDisabled={isLoading}
+                            value={password}
+                            onChange={(e) => setPassword(e.currentTarget.value)}
                         />
                         {errors && <p className="text-danger">{errors}</p>}
                         <Button
