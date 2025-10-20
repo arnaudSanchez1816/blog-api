@@ -5,8 +5,9 @@ import { useCallback, useState } from "react"
 import PublishPostButton from "./PublishPostButton"
 import HidePostButton from "./HidePostButton"
 import EditPostButton from "./EditPostButton"
+import { useFetcher } from "react-router"
 
-function ControlsButtonsGroup({ post }) {
+function ControlsButtonsGroup({ post, fetcher }) {
     const { id, publishedAt } = post
     const [busyButton, setBusyButton] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
@@ -22,12 +23,14 @@ function ControlsButtonsGroup({ post }) {
                 busyButtonRef={busyButton}
                 postId={id}
                 isLoading={isLoading}
+                fetcher={fetcher}
             />
             <DeletePostButton
                 postId={id}
                 setIsLoading={setIsLoadingCallback}
                 isLoading={isLoading}
                 busyButtonRef={busyButton}
+                fetcher={fetcher}
             />
             {!publishedAt ? (
                 <PublishPostButton
@@ -35,6 +38,7 @@ function ControlsButtonsGroup({ post }) {
                     postId={id}
                     busyButtonRef={busyButton}
                     setIsLoading={setIsLoadingCallback}
+                    fetcher={fetcher}
                 />
             ) : (
                 <HidePostButton
@@ -42,6 +46,7 @@ function ControlsButtonsGroup({ post }) {
                     postId={id}
                     busyButtonRef={busyButton}
                     setIsLoading={setIsLoadingCallback}
+                    fetcher={fetcher}
                 />
             )}
         </>
@@ -49,11 +54,13 @@ function ControlsButtonsGroup({ post }) {
 }
 
 export default function PostAdminControls({ post }) {
+    const fetcher = useFetcher()
+
     return (
         <>
-            <div className="hidden min-w-32 lg:block">
+            <div className="min-w-38 hidden lg:block">
                 <div className="flex gap-2 xl:flex-col">
-                    <ControlsButtonsGroup post={post} />
+                    <ControlsButtonsGroup post={post} fetcher={fetcher} />
                 </div>
             </div>
             <Popover backdrop="opaque" placement="left">
@@ -70,7 +77,7 @@ export default function PostAdminControls({ post }) {
                 <PopoverContent className="p-4">
                     <p className="text-lg font-bold">Controls</p>
                     <div className="mt-4 flex flex-col gap-2">
-                        <ControlsButtonsGroup post={post} />
+                        <ControlsButtonsGroup post={post} fetcher={fetcher} />
                     </div>
                 </PopoverContent>
             </Popover>

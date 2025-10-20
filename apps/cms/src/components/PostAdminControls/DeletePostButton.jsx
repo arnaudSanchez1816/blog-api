@@ -1,52 +1,26 @@
-import { addToast, Button } from "@heroui/react"
-import useAuth from "@repo/auth-provider/useAuth"
-import { deletePost } from "@repo/client-api/posts"
+import { Button } from "@heroui/react"
 import DeleteIcon from "@repo/ui/components/Icons/DeleteIcon"
-import { useCallback, useRef, useState } from "react"
-import { useNavigate } from "react-router"
-import PostAdminControlsButton from "./PostAdminControlsButton"
+import { DELETE_INTENT } from "../../pages/Post"
 
-export default function DeletePostButton({
-    isLoading,
-    setIsLoading,
-    postId,
-    busyButtonRef,
-}) {
-    const { accessToken } = useAuth()
-    const navigate = useNavigate()
-    const buttonRef = useRef(null)
-
-    const deletePostMutation = useCallback(async () => {
-        try {
-            setIsLoading(true, buttonRef.current)
-            await deletePost(postId, accessToken)
-            await navigate("/")
-            addToast({
-                title: "Success",
-                description: "Post deleted successfully !",
-                color: "success",
-            })
-        } catch (error) {
-            addToast({
-                title: "Failed to delete post",
-                description: `${error.status} : ${error.statusText}`,
-                color: "danger",
-            })
-        } finally {
-            setIsLoading(false)
-        }
-    }, [setIsLoading, postId, accessToken, navigate])
-
+export default function DeletePostButton({ postId, fetcher }) {
+    const busy = fetcher.state !== "idle"
+    const intent = fetcher.formData?.get("intent") || null
+    const isBusyButton = intent === DELETE_INTENT
     return (
-        <PostAdminControlsButton
-            ref={buttonRef}
-            startContent={<DeleteIcon />}
-            color="danger"
-            isLoading={isLoading}
-            busyButtonRef={busyButtonRef}
-            onPress={deletePostMutation}
-        >
-            Delete
-        </PostAdminControlsButton>
+        <fetcher.Form method="DELETE" action={`/posts/${postId}`}>
+            <Button
+                color="danger"
+                startContent={<DeleteIcon />}
+                className="w-full font-medium"
+                isLoading={busy && isBusyButton}
+                isDisabled={busy && !isBusyButton}
+                type="submit"
+                name="intent"
+                spinnerPlacement="end"
+                value={DELETE_INTENT}
+            >
+                Delete
+            </Button>
+        </fetcher.Form>
     )
 }

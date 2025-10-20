@@ -16,7 +16,7 @@ import ProtectedRoute, { authLoader } from "./components/ProtectedRoute"
 import ErrorView from "@repo/ui/components/ErrorView"
 import Home from "./pages/Home"
 import AllPosts from "./pages/AllPosts"
-import Post, { postLoader } from "./pages/Post"
+import Post, { postAction, postLoader } from "./pages/Post"
 import { AuthProvider } from "@repo/auth-provider/AuthProvider"
 import useAuth from "@repo/auth-provider/useAuth"
 
@@ -62,6 +62,12 @@ function Root() {
                                             loader={({ params }) =>
                                                 postLoader(
                                                     { params },
+                                                    accessToken
+                                                )
+                                            }
+                                            action={({ params, request }) =>
+                                                postAction(
+                                                    { params, request },
                                                     accessToken
                                                 )
                                             }

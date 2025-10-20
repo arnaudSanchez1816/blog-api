@@ -1,18 +1,17 @@
-import { useRef } from "react"
 import { Button, Link } from "@heroui/react"
 import EditIcon from "@repo/ui/components/Icons/EditIcon"
 
-export default function EditPostButton({ postId, isLoading, busyButtonRef }) {
-    const buttonRef = useRef(null)
+export default function EditPostButton({ postId, fetcher }) {
+    const busy = fetcher.state !== "idle"
 
     return (
         <Button
-            ref={buttonRef}
             href={`/posts/${postId}/edit`}
             as={Link}
             startContent={<EditIcon />}
             color="primary"
-            disabled={isLoading && buttonRef.current !== busyButtonRef}
+            className="w-full font-medium"
+            isDisabled={busy}
         >
             Edit
         </Button>
