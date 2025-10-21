@@ -1,6 +1,6 @@
 import EyeIcon from "@repo/ui/components/Icons/EyeIcon"
 import { Button } from "@heroui/react"
-import { PUBLISH_INTENT } from "../../pages/Post"
+import { PUBLISH_INTENT } from "../../actions/posts"
 
 export default function PublishPostButton({ postId, fetcher }) {
     const busy = fetcher.state !== "idle"

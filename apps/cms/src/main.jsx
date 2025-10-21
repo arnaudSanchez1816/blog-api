@@ -16,9 +16,10 @@ import ProtectedRoute, { authLoader } from "./components/ProtectedRoute"
 import ErrorView from "@repo/ui/components/ErrorView"
 import Home from "./pages/Home"
 import AllPosts from "./pages/AllPosts"
-import Post, { postAction, postLoader } from "./pages/Post"
+import Post, { postLoader } from "./pages/Post"
 import { AuthProvider } from "@repo/auth-provider/AuthProvider"
 import useAuth from "@repo/auth-provider/useAuth"
+import { postsAction } from "./actions/posts"
 
 function Root() {
     const { user, logout, accessToken } = useAuth()
@@ -48,7 +49,15 @@ function Root() {
                                     loader={searchLayoutLoader}
                                 >
                                     <Route index element={<Home />}></Route>
-                                    <Route path="/posts">
+                                    <Route
+                                        path="/posts"
+                                        action={({ request, params }) =>
+                                            postsAction(
+                                                { request, params },
+                                                accessToken
+                                            )
+                                        }
+                                    >
                                         <Route
                                             index
                                             element={<AllPosts />}
@@ -66,7 +75,7 @@ function Root() {
                                                 )
                                             }
                                             action={({ params, request }) =>
-                                                postAction(
+                                                postsAction(
                                                     { params, request },
                                                     accessToken
                                                 )

@@ -1,6 +1,6 @@
 import { Button } from "@heroui/react"
 import DeleteIcon from "@repo/ui/components/Icons/DeleteIcon"
-import { DELETE_INTENT } from "../../pages/Post"
+import { DELETE_INTENT } from "../../actions/posts"
 
 export default function DeletePostButton({ postId, fetcher }) {
     const busy = fetcher.state !== "idle"
