@@ -20,6 +20,8 @@ import Post, { postLoader } from "./pages/Post"
 import { AuthProvider } from "@repo/auth-provider/AuthProvider"
 import useAuth from "@repo/auth-provider/useAuth"
 import { postsAction } from "./actions/posts"
+import Tags, { tagsLoader } from "./pages/Tags"
+import { tagsAction } from "./actions/tags"
 
 function Root() {
     const { user, logout, accessToken } = useAuth()
@@ -83,6 +85,14 @@ function Root() {
                                         />
                                     </Route>
                                 </Route>
+                                <Route
+                                    path="/tags"
+                                    element={<Tags />}
+                                    loader={tagsLoader}
+                                    action={({ request }) =>
+                                        tagsAction({ request }, accessToken)
+                                    }
+                                ></Route>
                             </Route>
                             <Route path="/login" element={<Login />}></Route>
                             <Route path="/logout" action={logout}></Route>

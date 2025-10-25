@@ -82,9 +82,9 @@ export const deleteTag = [
     async (req, res, next) => {
         try {
             const { id } = req.params
-            await tagService.deleteTag(id)
+            const deletedTag = await tagService.deleteTag(id)
 
-            return res.status(204).send()
+            return res.status(200).send(deletedTag)
         } catch (error) {
             next(error)
         }
