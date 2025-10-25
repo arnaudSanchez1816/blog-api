@@ -8,7 +8,7 @@ import {
     useSearchParams,
 } from "react-router"
 import { useCallback, useEffect, useRef, useState } from "react"
-import Tag from "@repo/ui/components/Tag"
+import TagLink from "@repo/ui/components/TagLink"
 import SearchIcon from "@repo/ui/components/Icons/SearchIcon"
 import ThreeColumnLayout from "./ThreeColumnLayout"
 
@@ -108,7 +108,7 @@ export default function SearchLayout() {
                         <h3 className="text-lg font-medium">All tags</h3>
                         <div className="mt-6 flex max-w-full flex-wrap gap-2">
                             {tags.map((tag) => (
-                                <Tag key={tag.id} tag={tag} />
+                                <TagLink key={tag.id} tag={tag} />
                             ))}
                         </div>
                     </div>

@@ -1,6 +1,6 @@
 import { Button, Link } from "@heroui/react"
 
-export default function Tag({ tag }) {
+export default function TagLink({ tag }) {
     return (
         <Button
             color="secondary"

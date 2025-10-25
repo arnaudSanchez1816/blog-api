@@ -1,4 +1,4 @@
-import Tag from "@repo/ui/components/Tag"
+import TagLink from "./TagLink"
 import { format } from "date-fns"
 
 export default function PostHeader({ post }) {
@@ -21,7 +21,7 @@ export default function PostHeader({ post }) {
                 {tags && tags.length > 0 && (
                     <div className="flex max-w-full flex-wrap gap-2">
                         {tags.map((tag) => (
-                            <Tag key={tag.id} tag={tag} />
+                            <TagLink key={tag.id} tag={tag} />
                         ))}
                     </div>
                 )}
