@@ -12,7 +12,7 @@ import commentsRouter from "./comments/commentsRouter.js"
 import tagsRouter from "./tags/tagsRouter.js"
 import passport from "./config/passport.js"
 import { pino } from "./config/pino.js"
-import { ZodError } from "zod"
+import { ZodError, z } from "zod"
 import cors from "cors"
 import { AlreadyExistsError } from "./helpers/errors.js"
 import { Prisma } from "@prisma/client"
@@ -52,7 +52,8 @@ app.use((req, res, next) => {
 // eslint-disable-next-line
 app.use((error, req, res, next) => {
     pino.error(error)
-    let errors = error.message
+    let errorMessage = error.message
+    let details = undefined
 
     if (error instanceof AlreadyExistsError) {
         error.status = 400
@@ -64,32 +65,48 @@ app.use((error, req, res, next) => {
                 const { details } = error
                 if (details.includes("RecordNotFound")) {
                     error.status = 404
-                    errors = "Not found"
+                    errorMessage = "Not found"
                 }
                 break
             }
             case "P2025":
                 error.status = 404
-                errors = "Not found"
+                errorMessage = "Not found"
                 break
             default:
                 error.status = 500
-                errors = error.message
+                errorMessage = error.message
                 break
         }
     }
 
     if (error instanceof ZodError) {
-        error = error.issues.map((e) => {
-            return {
-                path: e.path,
-                message: e.message,
+        errorMessage = "Invalid input data"
+        const ignoredPaths = ["body", "query", "params"]
+        details = error.issues.reduce((detailsMap, issue) => {
+            const fieldName = issue.path
+                .filter((p) => !ignoredPaths.includes(p))
+                .join(".")
+            const detailsValue = detailsMap[fieldName]
+            if (!detailsValue) {
+                // Set as string
+                detailsMap[fieldName] = issue.message
+            } else {
+                // Replace the string with an array
+                detailsMap[fieldName] =
+                    typeof detailsValue === "string"
+                        ? [detailsValue, issue.message]
+                        : [...detailsValue, issue.message]
             }
-        })
+
+            return detailsMap
+        }, {})
         error.status = 400
     }
 
-    return res.status(error.status || 500).json({ errors })
+    return res
+        .status(error.status || 500)
+        .json({ error: { errorMessage, details } })
 })
 
 export default app
