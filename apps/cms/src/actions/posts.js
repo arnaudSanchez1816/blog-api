@@ -1,6 +1,7 @@
 import { addToast } from "@heroui/react"
 import { deletePost, hidePost, publishPost } from "@repo/client-api/posts"
 import { data, redirect } from "react-router"
+import { parseErrorResponse } from "../utils/parseErrorResponse"
 
 export const DELETE_INTENT = "delete"
 export const PUBLISH_INTENT = "publish"
@@ -62,19 +63,16 @@ async function createNewPost({ formData, accessToken }) {
         return redirect(`/posts/${id}`)
     } catch (error) {
         if (error instanceof Response) {
+            const errorResponse = await parseErrorResponse(error)
+            const { status, errorMessage } = errorResponse
             addToast({
                 title: "Failed to create a new article",
-                description: `[${error.status}] - ${error.statusText}`,
+                description: `[${status}] - ${errorMessage}`,
                 color: "danger",
             })
-            return
+            return errorResponse
         }
-
-        console.error(error)
-        addToast({
-            title: "Failed to create a new article",
-            color: "danger",
-        })
+        return error
     }
 }
 
@@ -88,11 +86,17 @@ async function deletePostAction({ postId, accessToken }) {
         })
         return redirect("/")
     } catch (error) {
-        addToast({
-            title: "Failed to delete post",
-            description: `${error.status || 500} : ${error.statusText || error.message}`,
-            color: "danger",
-        })
+        if (error instanceof Response) {
+            const errorResponse = await parseErrorResponse(error)
+            const { status, errorMessage } = errorResponse
+            addToast({
+                title: "Failed to delete post",
+                description: `${status || 500} : ${errorMessage}`,
+                color: "danger",
+            })
+            return errorResponse
+        }
+        return error
     }
 }
 
@@ -105,11 +109,17 @@ async function publishPostAction({ postId, accessToken }) {
             color: "success",
         })
     } catch (error) {
-        addToast({
-            title: "Failed to publish post",
-            description: `${error.status || 500} : ${error.statusText || error.message}`,
-            color: "danger",
-        })
+        if (error instanceof Response) {
+            const errorResponse = await parseErrorResponse(error)
+            const { status, errorMessage } = errorResponse
+            addToast({
+                title: "Failed to publish post",
+                description: `${status || 500} : ${errorMessage}`,
+                color: "danger",
+            })
+            return errorResponse
+        }
+        return error
     }
 }
 
@@ -122,10 +132,16 @@ async function hidePostAction({ postId, accessToken }) {
             color: "success",
         })
     } catch (error) {
-        addToast({
-            title: "Failed to hide post",
-            description: `${error.status || 500} : ${error.statusText || error.message}`,
-            color: "danger",
-        })
+        if (error instanceof Response) {
+            const errorResponse = await parseErrorResponse(error)
+            const { status, errorMessage } = errorResponse
+            addToast({
+                title: "Failed to hide post",
+                description: `${status || 500} : ${errorMessage}`,
+                color: "danger",
+            })
+            return errorResponse
+        }
+        return error
     }
 }
