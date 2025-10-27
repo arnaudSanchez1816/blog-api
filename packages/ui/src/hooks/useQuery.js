@@ -47,6 +47,7 @@ export default function useQuery({ queryFn, queryKey, enabled = true }) {
                     if (!ignore) {
                         setLoading(false)
                     }
+                    setFetchData(false)
                 }
             }
             doFetch()
