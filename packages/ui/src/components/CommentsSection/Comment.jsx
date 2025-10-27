@@ -1,7 +1,8 @@
 import { Divider } from "@heroui/react"
+import { format } from "date-fns"
 
 export default function Comment({ comment }) {
-    const { id, username, body } = comment
+    const { id, username, body, createdAt } = comment
     return (
         <div id={`comment-${id}`}>
             <div className="flex flex-col gap-y-2 lg:flex-row lg:justify-between">
@@ -11,8 +12,8 @@ export default function Comment({ comment }) {
                     <span>says:</span>
                 </div>
                 <div className="text-foreground/70 lg:text-foreground lg:text-medium text-sm">
-                    <time dateTime="2025-01-02 11:26">
-                        January 02, 2025 at 11:26
+                    <time dateTime={format(createdAt, "y-MM-dd HH:mm")}>
+                        {`${format(createdAt, "MMMM do, y")} at ${format(createdAt, "HH:mm")}`}
                     </time>
                 </div>
             </div>
