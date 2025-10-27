@@ -46,3 +46,24 @@ export const fetchComments = async (postId, accessToken = null) => {
     const comments = await response.json()
     return comments
 }
+
+export const deleteComment = async (commentId, accessToken) => {
+    if (!commentId) {
+        throw new Error("Comment id is invalid")
+    }
+
+    const url = new URL(`./comments/${commentId}`, import.meta.env.VITE_API_URL)
+    const response = await fetch(url, {
+        mode: "cors",
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+        },
+    })
+    if (!response.ok) {
+        throw response
+    }
+    const deletedComment = await response.json()
+    return deletedComment
+}

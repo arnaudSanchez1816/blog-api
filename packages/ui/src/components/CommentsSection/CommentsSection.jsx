@@ -2,13 +2,12 @@ import { Alert, Button } from "@heroui/react"
 import Comment from "./Comment"
 import CommentSkeleton from "./CommentSkeleton"
 import CommentReplyForm from "./CommentReplyForm"
-import { useLocation } from "react-router"
 import useQuery from "../../hooks/useQuery"
 import { useCallback } from "react"
 import { fetchComments } from "@repo/client-api/comments"
 import useAuth from "@repo/auth-provider/useAuth"
 
-const commentsSectionId = "comments"
+export const commentsSectionId = "comments"
 
 function CommentsSectionWrapper({
     commentsCount,
@@ -28,14 +27,13 @@ function CommentsSectionWrapper({
     )
 }
 
-export default function CommentsSection({ postId, commentsCount }) {
+export default function CommentsSection({
+    postId,
+    commentsCount,
+    commentRender = null,
+    autoFetch = true,
+}) {
     const { accessToken } = useAuth()
-    let queryEnabled = false
-    const { hash } = useLocation()
-
-    if (hash && hash === `#${commentsSectionId}`) {
-        queryEnabled = true
-    }
 
     const fetchCommentsQuery = useCallback(
         () => fetchComments(postId, accessToken),
@@ -44,7 +42,7 @@ export default function CommentsSection({ postId, commentsCount }) {
 
     const [comments, loading, error, triggerFetch] = useQuery({
         queryFn: fetchCommentsQuery,
-        enabled: queryEnabled,
+        enabled: autoFetch,
         queryKey: ["comments", postId],
     })
 
@@ -122,9 +120,23 @@ export default function CommentsSection({ postId, commentsCount }) {
             fetchComments={triggerFetch}
             postId={postId}
         >
-            {results.map((comment) => (
-                <Comment key={comment.id} comment={comment} />
-            ))}
+            {results.length > 0 ? (
+                results.map((comment) =>
+                    commentRender ? (
+                        commentRender(comment, {
+                            refreshComments: triggerFetch,
+                        })
+                    ) : (
+                        <Comment key={comment.id} comment={comment} />
+                    )
+                )
+            ) : (
+                <div className="flex items-center justify-center">
+                    <p className="text-foreground/70 text-lg font-medium">
+                        No comments yet
+                    </p>
+                </div>
+            )}
         </CommentsSectionWrapper>
     )
 }

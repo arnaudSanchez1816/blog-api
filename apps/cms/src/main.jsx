@@ -22,6 +22,7 @@ import useAuth from "@repo/auth-provider/useAuth"
 import { postsAction } from "./actions/posts"
 import Tags, { tagsLoader } from "./pages/Tags"
 import { tagsAction } from "./actions/tags"
+import { commentsAction } from "./actions/comments"
 
 function Root() {
     const { user, logout, accessToken } = useAuth()
@@ -96,6 +97,12 @@ function Root() {
                             </Route>
                             <Route path="/login" element={<Login />}></Route>
                             <Route path="/logout" action={logout}></Route>
+                            <Route
+                                path="/comments/:id"
+                                action={(actionArgs) =>
+                                    commentsAction(actionArgs, accessToken)
+                                }
+                            ></Route>
                             <Route
                                 path="/*"
                                 loader={() => {
