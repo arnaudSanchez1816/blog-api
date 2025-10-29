@@ -2,7 +2,7 @@ import { useLoaderData, useNavigation, useOutletContext } from "react-router"
 import SadFaceIcon from "@repo/ui/components/Icons/SadFaceIcon"
 import { Pagination, Spinner } from "@heroui/react"
 import { useEffect } from "react"
-import SortByButton from "../../../../../apps/web/src/components/SortByButton"
+import SortByPublishedButton from "../SortByPublishedButton"
 import useTwBreakpoint from "@repo/ui/hooks/useTwBreakpoint"
 import PostItem from "@repo/ui/components/PostsList/PostItem"
 import useParamSearchParams from "@repo/ui/hooks/useParamSearchParams"
@@ -39,7 +39,7 @@ export default function Search() {
     const currentPage = Number(currentPageString)
 
     useEffect(() => {
-        setLeftContent(<SortByButton />)
+        setLeftContent(<SortByPublishedButton />)
         return () => setLeftContent(undefined)
     }, [setLeftContent])
 

@@ -6,10 +6,10 @@ import {
 } from "react-router"
 import { Fragment, Suspense, useEffect } from "react"
 import useParamSearchParams from "@repo/ui/hooks/useParamSearchParams"
-import SortByButton from "../components/SortByButton"
 import PostsList from "@repo/ui/components/PostsList/PostsList"
 import PostsListSkeleton from "@repo/ui/components/PostsList/PostsListSkeleton"
 import { fetchPosts } from "@repo/client-api/posts"
+import SortByPublishedButton from "@repo/ui/components/SortByPublishedButton"
 
 const pageSize = 10
 
@@ -36,7 +36,7 @@ export default function Posts() {
     const currentPage = Number(currentPageString)
 
     useEffect(() => {
-        setLeftContent(<SortByButton />)
+        setLeftContent(<SortByPublishedButton />)
         return () => setLeftContent(undefined)
     }, [setLeftContent])
 
