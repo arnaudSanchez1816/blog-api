@@ -9,7 +9,7 @@ import { postSchema } from "@repo/zod-schemas"
 import { useEffect } from "react"
 import { useLoaderData, useLocation, useOutletContext } from "react-router"
 import PostAdminControls from "../components/PostAdminControls/PostAdminControls"
-import CmsComment from "../components/CmsComment"
+import CommentWithControls from "../components/CommentWithControls"
 
 export async function postLoader({ params }, accessToken) {
     const postIdSchema = postSchema.pick({ id: true })
@@ -51,7 +51,7 @@ export default function Post() {
                     autoFetch={commentsAutoFetched}
                     commentsCount={commentsCount}
                     commentRender={(comment, { refreshComments }) => (
-                        <CmsComment
+                        <CommentWithControls
                             key={comment.id}
                             comment={comment}
                             refreshComments={refreshComments}

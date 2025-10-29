@@ -11,7 +11,7 @@ import EditIcon from "@repo/ui/components/Icons/EditIcon"
 import { format } from "date-fns"
 import { useFetcher } from "react-router"
 
-export default function CmsComment({ comment, refreshComments }) {
+export default function CommentWithControls({ comment, refreshComments }) {
     const { id, username, body, createdAt } = comment
     const fetcher = useFetcher({ key: "comments" })
 
