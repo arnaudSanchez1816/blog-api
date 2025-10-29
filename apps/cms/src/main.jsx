@@ -12,7 +12,7 @@ import App from "./App"
 import { Spinner } from "@heroui/react"
 import Login from "./pages/Login"
 import ProtectedRoute, { authLoader } from "./components/ProtectedRoute"
-import ErrorView from "@repo/ui/components/ErrorView"
+import Error from "@repo/ui/components/Error"
 import Home from "./pages/Home"
 import AllPosts from "./pages/AllPosts"
 import Post, { postLoader } from "./pages/Post"
@@ -45,7 +45,7 @@ function Root() {
                             </div>
                         }
                     >
-                        <Route errorElement={<ErrorView />}>
+                        <Route errorElement={<Error />}>
                             <Route
                                 element={
                                     <ProtectedRoute redirect="/login" replace />

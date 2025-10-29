@@ -13,7 +13,7 @@ import Home, { homeLoader } from "./pages/Home"
 import About, { aboutLoader } from "./pages/About"
 import Posts, { postsLoader } from "./pages/Posts"
 import PostPage, { postPageLoader } from "./pages/Post"
-import ErrorView from "@repo/ui/components/ErrorView"
+import Error from "@repo/ui/components/Error"
 import { Spinner } from "@heroui/react"
 import Search, { searchLoader } from "@repo/ui/components/Search/Search"
 import SearchLayout, {
@@ -31,7 +31,7 @@ const router = createBrowserRouter(
                 </div>
             }
         >
-            <Route errorElement={<ErrorView />}>
+            <Route errorElement={<Error />}>
                 <Route element={<SearchLayout />} loader={searchLayoutLoader}>
                     <Route
                         index

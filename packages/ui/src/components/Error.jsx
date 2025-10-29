@@ -1,6 +1,6 @@
 import { isRouteErrorResponse, useRouteError } from "react-router"
 
-export default function ErrorView() {
+export default function Error() {
     const error = useRouteError()
     const devMode = import.meta.env.DEV
 
