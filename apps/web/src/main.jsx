@@ -69,7 +69,7 @@ const router = createBrowserRouter(
             </Route>
             <Route
                 path="/*"
-                errorElement={<ErrorView />}
+                errorElement={<Error />}
                 loader={() => {
                     throw data("Page not found", 404)
                 }}
