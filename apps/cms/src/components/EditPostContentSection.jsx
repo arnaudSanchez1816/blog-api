@@ -4,9 +4,7 @@ import EyeIcon from "@repo/ui/components/Icons/EyeIcon"
 import PostMarkdown from "@repo/ui/components/PostMarkdown"
 import { useState } from "react"
 
-export default function EditPostContentSection({ post }) {
-    const { body } = post
-    const [content, setContent] = useState(body)
+export default function EditPostContentSection({ newBody, setNewBody }) {
     const [editMode, setEditMode] = useState("edit")
     return (
         <div className="relative mt-8">
@@ -54,16 +52,16 @@ export default function EditPostContentSection({ post }) {
             {editMode === "edit" && (
                 <Textarea
                     name="body"
-                    value={content}
+                    value={newBody}
                     aria-label="Post edit area"
                     variant="faded"
                     minRows={20}
                     maxRows={30}
-                    onValueChange={setContent}
+                    onValueChange={setNewBody}
                     size="lg"
                 ></Textarea>
             )}
-            {editMode === "preview" && <PostMarkdown>{content}</PostMarkdown>}
+            {editMode === "preview" && <PostMarkdown>{newBody}</PostMarkdown>}
         </div>
     )
 }

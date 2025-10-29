@@ -88,6 +88,10 @@ export const deletePost = async (postId, accessToken) => {
     if (!response.ok) {
         throw response
     }
+
+    const post = await response.json()
+
+    return post
 }
 
 export const publishPost = async (postId, accessToken) => {
@@ -124,4 +128,30 @@ export const hidePost = async (postId, accessToken) => {
     if (!response.ok) {
         throw response
     }
+}
+
+export const updatePost = async (
+    postId,
+    { body, title, tags },
+    accessToken
+) => {
+    const apiUrl = import.meta.env.VITE_API_URL
+    const url = new URL(`./posts/${postId}`, apiUrl)
+    const response = await fetch(url, {
+        mode: "cors",
+        method: "PUT",
+        headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ body, title, tags }),
+    })
+
+    if (!response.ok) {
+        throw response
+    }
+
+    const post = await response.json()
+
+    return post
 }

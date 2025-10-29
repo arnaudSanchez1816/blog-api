@@ -25,10 +25,8 @@ function Tag({ tag, onDeleteTag }) {
     )
 }
 
-export default function EditTagsSection({ post }) {
-    const { tags } = post
+export default function EditTagsSection({ newTags, setNewTags }) {
     const { allTags } = useLoaderData()
-    const [newTags, setNewTags] = useState(tags)
     const tagInputRef = useRef(null)
 
     const availableTags = _.differenceWith(

@@ -1,14 +1,15 @@
 import { fetchPost } from "@repo/client-api/posts"
 import { postSchema } from "@repo/zod-schemas"
 import {
-    Form,
+    useActionData,
     useBlocker,
+    useFetcher,
     useLoaderData,
     useNavigation,
     useSubmit,
 } from "react-router"
-import { useCallback, useState } from "react"
-import { Button, Divider } from "@heroui/react"
+import { useCallback, useEffect, useState } from "react"
+import { addToast, Button, Divider } from "@heroui/react"
 import { fetchTags } from "@repo/client-api/tags"
 import _ from "lodash"
 import EditablePostTitle from "../components/EditablePostTitle"
@@ -16,6 +17,8 @@ import EditTagsSection from "../components/EditTagsSection"
 import EditPostContentSection from "../components/EditPostContentSection"
 import ThreeColumnLayout from "../layouts/ThreeColumnLayout"
 import SaveIcon from "@repo/ui/components/Icons/SaveIcon"
+import z from "zod"
+import Confirm from "../components/modals/Confirm"
 
 export async function editPostLoader({ params }, accessToken) {
     const postIdSchema = postSchema.pick({ id: true })
@@ -34,43 +37,128 @@ function EditPostLayout({ children, left, right }) {
 
 export default function EditPost() {
     const { post } = useLoaderData()
+    const { id, title, body, tags } = post
+    const [newTitle, setNewTitle] = useState(title)
+    const [newBody, setNewBody] = useState(body)
+    const [newTags, setNewTags] = useState(tags)
     const [isDirty, setIsDirty] = useState(false)
     const blocker = useBlocker(useCallback(() => isDirty, [isDirty]))
-    const navigation = useNavigation()
-    const submit = useSubmit()
+    const fetcher = useFetcher()
 
-    const isSaving = navigation.state !== "idle"
+    const isSaving =
+        fetcher.state !== "idle" && fetcher.formAction === `/posts/${id}/edit`
 
-    const onSave = (e) => {
-        e.preventDefault()
+    const onSave = async () => {
+        if (!isDirty) {
+            return
+        }
+
+        try {
+            const newData = {
+                title: newTitle,
+                body: newBody,
+                tags: newTags.map((tag) => tag.id),
+            }
+
+            // Check form validation
+            const updatePostValidator = postSchema.pick({
+                body: true,
+                title: true,
+                tags: true,
+            })
+            await updatePostValidator.parseAsync(newData)
+            // Submit form
+            await fetcher.submit(newData, {
+                action: `/posts/${id}/edit`,
+                method: "PUT",
+                encType: "application/json",
+            })
+        } catch (error) {
+            if (error instanceof z.ZodError) {
+                console.error(z.flattenError(error))
+                addToast({
+                    title: "Failed to update post",
+                    description: "Post contains invalid content",
+                    color: "danger",
+                })
+            }
+        }
     }
 
-    return (
-        <EditPostLayout
-            left={
-                <div className="min-w-38">
-                    <p className="text-2xl font-medium xl:text-3xl">
-                        Edit post
-                    </p>
-                    <Button
-                        isLoading={isSaving}
-                        color="primary"
-                        size="md"
-                        className="min-sm:max-xl:max-w-32 mt-4 w-full font-medium"
-                        onPress={onSave}
-                        startContent={<SaveIcon />}
-                    >
-                        Save
-                    </Button>
-                </div>
+    useEffect(() => {
+        if (fetcher.data?.ok) {
+            if (blocker.state === "blocked") {
+                // proceed with the blocked navigation
+                blocker.proceed()
             }
-        >
-            <EditablePostTitle post={post} />
-            <div className="mt-4">
-                <EditTagsSection post={post} />
-            </div>
-            <Divider className="mt-4" />
-            <EditPostContentSection post={post} />
-        </EditPostLayout>
+        }
+    }, [blocker, fetcher.data])
+
+    useEffect(() => {
+        if (isDirty) {
+            return
+        }
+        if (newTitle !== title) {
+            setIsDirty(true)
+        }
+        if (newBody !== body) {
+            setIsDirty(true)
+        }
+        if (
+            _.xorWith(newTags, tags, (newT, oldT) => newT.id === oldT.id)
+                .length !== 0
+        ) {
+            setIsDirty(true)
+        }
+    }, [newTitle, newBody, newTags, isDirty, title, body, tags])
+
+    return (
+        <>
+            <EditPostLayout
+                left={
+                    <div className="min-w-38">
+                        <p className="text-2xl font-medium xl:text-3xl">
+                            Edit post
+                        </p>
+                        <Button
+                            isLoading={isSaving}
+                            color="primary"
+                            size="md"
+                            className="min-sm:max-xl:max-w-32 mt-4 w-full font-medium"
+                            onPress={onSave}
+                            isDisabled={!isDirty}
+                            startContent={<SaveIcon />}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <EditablePostTitle
+                    newTitle={newTitle}
+                    setNewTitle={setNewTitle}
+                />
+                <div className="mt-4">
+                    <EditTagsSection
+                        newTags={newTags}
+                        setNewTags={setNewTags}
+                    />
+                </div>
+                <Divider className="mt-4" />
+                <EditPostContentSection
+                    newBody={newBody}
+                    setNewBody={setNewBody}
+                />
+            </EditPostLayout>
+            {blocker.state === "blocked" && (
+                <Confirm
+                    message={
+                        "You have unsaved modifications, are you sure you want to leave the current page ?"
+                    }
+                    onConfirm={() => blocker.proceed()}
+                    onCancel={() => blocker.reset()}
+                />
+            )}
+        </>
     )
 }

@@ -1,9 +1,7 @@
 import { Button, Input, Textarea } from "@heroui/react"
 import { useEffect, useRef, useState } from "react"
 
-export default function EditablePostTitle({ post }) {
-    const { title } = post
-    const [newTitle, setNewTitle] = useState(title)
+export default function EditablePostTitle({ newTitle, setNewTitle }) {
     const [isEditing, setIsEditing] = useState(false)
     const inputRef = useRef(null)
 
