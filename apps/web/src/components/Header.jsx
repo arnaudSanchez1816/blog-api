@@ -11,8 +11,8 @@ import {
 import { useEffect, useRef, useState } from "react"
 import { useLocation } from "react-router"
 import ThemeSwitcher from "@repo/ui/components/ThemeSwitcher"
-import BlogLogo from "./BlogLogo"
-import NavLink from "./NavLink"
+import BlogLogo from "@repo/ui/components/BlogLogo"
+import NavLink from "@repo/ui/components/NavLink"
 
 export default function Header({ title = "Blog-API", navItems = [] }) {
     const rootRef = useRef(null)
