@@ -1,15 +1,14 @@
-import { Button, Link } from "@heroui/react"
+import { Chip, Link } from "@heroui/react"
 
 export default function TagLink({ tag }) {
     return (
-        <Button
+        <Chip
             color="secondary"
             as={Link}
             href={`/search?tag=${tag.slug}`}
-            size="sm"
-            radius="sm"
+            size="md"
         >
             {tag.name}
-        </Button>
+        </Chip>
     )
 }
