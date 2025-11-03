@@ -6,4 +6,7 @@ import tailwindcss from "@tailwindcss/vite"
 export default defineConfig({
     assetsInclude: ["**/*md"],
     plugins: [react(), tailwindcss()],
+    preview: {
+        port: 5173,
+    },
 })
