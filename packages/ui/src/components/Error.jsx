@@ -33,5 +33,28 @@ export default function Error() {
         )
     }
 
-    return <h1>Unknown error</h1>
+    const { message } = error
+    if (message && message.includes("NetworkError")) {
+        return (
+            <div className="flex h-full min-h-[50vh] flex-col items-center justify-center gap-4">
+                <h1 className="text-danger text-5xl font-medium">
+                    Something went wrong
+                </h1>
+                <p className="text-danger-700">
+                    Unable to connect with the server
+                </p>
+                {devMode && <pre>{error.stack}</pre>}
+            </div>
+        )
+    }
+
+    return (
+        <div className="flex h-full min-h-[50vh] flex-col items-center justify-center gap-4">
+            <h1 className="text-danger text-5xl font-medium">
+                Something went wrong
+            </h1>
+            <p className="text-danger-700">Unknown error</p>
+            {devMode && <pre>{error.stack}</pre>}
+        </div>
+    )
 }
