@@ -100,13 +100,16 @@ export const AuthProvider = ({ children, loaderComponent }) => {
             setAccessToken(accessToken)
             return { user }
         } catch (error) {
-            const body = await error.json()
-            const { errors } = body
-            let message = "Failed to login"
-            if (errors) {
-                message = errors
+            if (error instanceof Response) {
+                console.error(error)
+                const body = error.body ? await error.json() : {}
+                const { errorMessage, details } = body.error || {
+                    errorMessage: "Failed to login",
+                }
+
+                return { error: errorMessage }
             }
-            return { error: message }
+            throw error
         }
     }, [])
 
