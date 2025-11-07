@@ -1,6 +1,4 @@
-import { Prisma } from "@prisma/client"
 import { prisma } from "../config/prisma.js"
-import { AlreadyExistsError } from "../helpers/errors.js"
 
 export const getTag = async (tagIdOrSlug) => {
     const isSlug = typeof tagIdOrSlug === "string"
@@ -21,28 +19,14 @@ export const getTags = async () => {
 }
 
 export const createTag = async ({ name, slug }) => {
-    try {
-        const newTag = await prisma.tag.create({
-            data: {
-                name,
-                slug,
-            },
-        })
+    const newTag = await prisma.tag.create({
+        data: {
+            name,
+            slug,
+        },
+    })
 
-        return newTag
-    } catch (error) {
-        if (
-            error instanceof Prisma.PrismaClientKnownRequestError &&
-            error.code === "P2002" &&
-            error.meta?.target.includes("slug")
-        ) {
-            throw new AlreadyExistsError(`Tag slug '${slug}' already exists.`, {
-                name: "slug",
-                value: slug,
-            })
-        }
-        throw error
-    }
+    return newTag
 }
 
 export const updateTag = async ({ id: tagIdOrSlug, name, slug }) => {

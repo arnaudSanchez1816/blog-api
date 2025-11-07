@@ -1,5 +1,6 @@
 import { ZodError, ZodAny } from "zod"
 import _ from "lodash"
+import { ValidationError } from "../lib/errors.js"
 
 /**
  *
@@ -21,8 +22,27 @@ export const validateRequest = (validator) => async (req, res, next) => {
         return next()
     } catch (error) {
         if (error instanceof ZodError) {
-            // Todo : Handle validation errors here ?
-            return next(error)
+            const ignoredPaths = ["body", "query", "params"]
+            const fields = error.issues.reduce((detailsMap, issue) => {
+                const fieldName = issue.path
+                    .filter((p) => !ignoredPaths.includes(p))
+                    .join(".")
+                const detailsValue = detailsMap[fieldName]
+                if (!detailsValue) {
+                    // Set as string
+                    detailsMap[fieldName] = issue.message
+                } else {
+                    // Replace the string with an array
+                    detailsMap[fieldName] =
+                        typeof detailsValue === "string"
+                            ? [detailsValue, issue.message]
+                            : [...detailsValue, issue.message]
+                }
+
+                return detailsMap
+            }, {})
+
+            throw new ValidationError("Invalid request", 400, fields)
         }
         // Rethrow
         throw error

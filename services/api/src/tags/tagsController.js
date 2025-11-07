@@ -8,6 +8,8 @@ import {
 import tagService from "./tagsService.js"
 import createHttpError from "http-errors"
 import { checkPermission } from "../middlewares/checkPermission.js"
+import { UniqueConstraintError, ValidationError } from "../lib/errors.js"
+import { handlePrismaKnownErrors } from "../helpers/errors.js"
 
 export const getTag = [
     validateRequest(getTagValidator),
@@ -45,12 +47,17 @@ export const createTag = [
     checkPermission("CREATE"),
     validateRequest(createTagValidator),
     async (req, res, next) => {
+        const { name, slug } = req.body
         try {
-            const { name, slug } = req.body
             const newTag = await tagService.createTag({ name, slug })
 
             return res.status(201).json(newTag)
         } catch (error) {
+            const handledError = handlePrismaKnownErrors(error)
+            if (handledError instanceof UniqueConstraintError) {
+                const message = `Tag with slug "${slug} already exists"`
+                throw new ValidationError(message, 400, { slug: message })
+            }
             next(error)
         }
     },

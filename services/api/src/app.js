@@ -11,11 +11,8 @@ import usersRouter from "./users/usersRouter.js"
 import commentsRouter from "./comments/commentsRouter.js"
 import tagsRouter from "./tags/tagsRouter.js"
 import passport from "./config/passport.js"
-import { pino } from "./config/pino.js"
-import { ZodError, z } from "zod"
 import cors from "cors"
-import { AlreadyExistsError } from "./helpers/errors.js"
-import { Prisma } from "@prisma/client"
+import { errorHandler } from "./middlewares/errorHandler.js"
 
 const app = express()
 
@@ -49,64 +46,6 @@ app.use((req, res, next) => {
 })
 
 // Error handler
-// eslint-disable-next-line
-app.use((error, req, res, next) => {
-    pino.error(error)
-    let errorMessage = error.message
-    let details = undefined
-
-    if (error instanceof AlreadyExistsError) {
-        error.status = 400
-    }
-
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        switch (error.code) {
-            case "P2016": {
-                const { details } = error
-                if (details.includes("RecordNotFound")) {
-                    error.status = 404
-                    errorMessage = "Not found"
-                }
-                break
-            }
-            case "P2025":
-                error.status = 404
-                errorMessage = "Not found"
-                break
-            default:
-                error.status = 500
-                errorMessage = error.message
-                break
-        }
-    }
-
-    if (error instanceof ZodError) {
-        errorMessage = "Invalid input data"
-        const ignoredPaths = ["body", "query", "params"]
-        details = error.issues.reduce((detailsMap, issue) => {
-            const fieldName = issue.path
-                .filter((p) => !ignoredPaths.includes(p))
-                .join(".")
-            const detailsValue = detailsMap[fieldName]
-            if (!detailsValue) {
-                // Set as string
-                detailsMap[fieldName] = issue.message
-            } else {
-                // Replace the string with an array
-                detailsMap[fieldName] =
-                    typeof detailsValue === "string"
-                        ? [detailsValue, issue.message]
-                        : [...detailsValue, issue.message]
-            }
-
-            return detailsMap
-        }, {})
-        error.status = 400
-    }
-
-    return res
-        .status(error.status || 500)
-        .json({ error: { errorMessage, details } })
-})
+app.use(errorHandler)
 
 export default app
