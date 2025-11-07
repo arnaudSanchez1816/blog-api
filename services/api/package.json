@@ -8,7 +8,7 @@
     "scripts": {
         "dev": "node --watch ./src/index.js | pnpx pino-pretty",
         "build": "pnpm run prisma:generate",
-        "start": "node ./src/index.js | pnpx pino-pretty",
+        "start": "NODE_ENV=production node ./src/index.js | pnpx pino-pretty",
         "lint": "eslint ./src",
         "test": "NODE_ENV=test vitest",
         "test:prisma:push": "dotenv -e .env.test -o -- pnpx prisma db push --skip-generate --force-reset",

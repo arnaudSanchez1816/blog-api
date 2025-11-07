@@ -1,12 +1,6 @@
 import { Prisma } from "@prisma/client"
 import { NotFoundError, UniqueConstraintError } from "../lib/errors.js"
 
-export class AuthenticationError extends Error {
-    constructor(message) {
-        super(message)
-    }
-}
-
 export const handlePrismaKnownErrors = (
     error,
     { uniqueConstraintName = null } = {}

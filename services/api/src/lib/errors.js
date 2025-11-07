@@ -12,8 +12,8 @@ export class BaseError extends Error {
 
     toResponse() {
         return {
-            name: this.name,
-            errorMessage: this.errorMessage,
+            //name: this.name,
+            errorMessage: this.message,
         }
     }
 }
@@ -27,7 +27,7 @@ export class NotFoundError extends BaseError {
 export class SignInError extends BaseError {
     constructor(
         errorMessage = "Invalid email or password",
-        statusCode = 400,
+        statusCode = 401,
         cause = null
     ) {
         super(errorMessage, statusCode, { name: "SignInError", cause })
