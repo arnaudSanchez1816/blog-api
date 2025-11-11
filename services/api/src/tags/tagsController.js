@@ -70,8 +70,7 @@ export const updateTag = [
         try {
             const { id } = req.params
             const { name, slug } = req.body
-            const updatedTag = await tagService.updateTag({
-                id,
+            const updatedTag = await tagService.updateTag(id, {
                 name,
                 slug,
             })
