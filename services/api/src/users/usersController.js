@@ -44,7 +44,7 @@ export const getCurrentUserPosts = async (req, res, next) => {
             results: posts,
         }
 
-        return res.json(responseJson)
+        return res.status(200).json(responseJson)
     } catch (error) {
         next(error)
     }
@@ -60,7 +60,7 @@ export const createUser = async (req, res, next) => {
             roleName: role,
         })
 
-        const { userPassword, ...newUserDetails } = newUser
+        const { password: userPassword, ...newUserDetails } = newUser
         return res.status(201).json(newUserDetails)
     } catch (error) {
         next(error)
