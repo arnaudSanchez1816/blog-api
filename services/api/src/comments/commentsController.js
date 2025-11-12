@@ -1,73 +1,54 @@
-import { validateRequest } from "../middlewares/validator.js"
-import {
-    deleteCommentValidator,
-    editCommentValidator,
-    getCommentValidator,
-} from "./commentsValidators.js"
 import * as commentsService from "./commentsService.js"
 import createHttpError from "http-errors"
-import { checkPermission } from "../middlewares/checkPermission.js"
-import { PermissionType } from "@prisma/client"
 
-export const getComment = [
-    validateRequest(getCommentValidator),
-    async (req, res, next) => {
-        try {
-            const { id: commentId } = req.params
-            const comment = await commentsService.getComment(commentId)
-            if (!comment) {
-                throw new createHttpError.NotFound()
-            }
-
-            return res.json(comment)
-        } catch (error) {
-            next(error)
+export const getComment = async (req, res, next) => {
+    try {
+        const { id: commentId } = req.params
+        const comment = await commentsService.getComment(commentId)
+        if (!comment) {
+            throw new createHttpError.NotFound()
         }
-    },
-]
 
-export const deleteComment = [
-    checkPermission(PermissionType.DELETE),
-    validateRequest(deleteCommentValidator),
-    async (req, res, next) => {
-        try {
-            const { id: commentId } = req.params
-            const comment = await commentsService.getComment(commentId)
-            if (!comment) {
-                throw new createHttpError.NotFound()
-            }
+        return res.status(200).json(comment)
+    } catch (error) {
+        next(error)
+    }
+}
 
-            await commentsService.deleteComment(commentId)
-
-            return res.status(204).send()
-        } catch (error) {
-            next(error)
+export const deleteComment = async (req, res, next) => {
+    try {
+        const { id: commentId } = req.params
+        const comment = await commentsService.getComment(commentId)
+        if (!comment) {
+            throw new createHttpError.NotFound()
         }
-    },
-]
 
-export const editComment = [
-    checkPermission(PermissionType.UPDATE),
-    validateRequest(editCommentValidator),
-    async (req, res, next) => {
-        try {
-            const { id: commentId } = req.params
-            const { username, body } = req.body
+        const deletedComment = await commentsService.deleteComment(commentId)
 
-            const comment = await commentsService.getComment(commentId)
-            if (!comment) {
-                throw new createHttpError.NotFound()
-            }
+        return res.status(200).json(deletedComment)
+    } catch (error) {
+        next(error)
+    }
+}
 
-            const updatedComment = await commentsService.updateComment({
-                commentId,
-                username,
-                body,
-            })
+export const editComment = async (req, res, next) => {
+    try {
+        const { id: commentId } = req.params
+        const { username, body } = req.body
 
-            return res.json(updatedComment)
-        } catch (error) {
-            next(error)
+        const comment = await commentsService.getComment(commentId)
+        if (!comment) {
+            throw new createHttpError.NotFound()
         }
-    },
-]
+
+        const updatedComment = await commentsService.updateComment({
+            commentId,
+            username,
+            body,
+        })
+
+        return res.status(200).json(updatedComment)
+    } catch (error) {
+        next(error)
+    }
+}
