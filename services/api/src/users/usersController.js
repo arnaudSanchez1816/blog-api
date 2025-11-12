@@ -6,7 +6,7 @@ import {
     createUserValidator,
     getCurrentUserPostsValidator,
 } from "./usersValidators.js"
-import usersService from "../users/usersService.js"
+import * as usersService from "../users/usersService.js"
 
 export const getCurrentUser = async (req, res, next) => {
     try {

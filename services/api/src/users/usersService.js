@@ -52,5 +52,3 @@ export const createUser = async ({
 
     return createdUser
 }
-
-export * as default from "./usersService.js"

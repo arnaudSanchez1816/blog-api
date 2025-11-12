@@ -3,7 +3,7 @@ import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt"
 import { Strategy as LocalStrategy } from "passport-local"
 import { Strategy as AnonymousStrategy } from "passport-anonymous"
 import bcrypt from "bcryptjs"
-import userService from "../users/usersService.js"
+import * as userService from "../users/usersService.js"
 import { SignInError } from "../lib/errors.js"
 
 const checkJwtUser = async (jwtPayload, done) => {
