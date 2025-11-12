@@ -57,5 +57,3 @@ export const generateRefreshToken = async (
 
     return refreshToken
 }
-
-export * as default from "./authService.js"

@@ -1,5 +1,5 @@
 import { REFRESH_TOKEN_COOKIE } from "../config/passport.js"
-import authService from "./authService.js"
+import * as authService from "./authService.js"
 import _ from "lodash"
 
 const COOKIE_REFRESH_TOKEN_MAX_AGE = 30 * 24 * 60 * 60 * 1000
