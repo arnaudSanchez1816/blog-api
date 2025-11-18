@@ -1,11 +1,14 @@
 import { beforeEach } from "vitest"
 import { mockDeep, mockReset } from "vitest-mock-extended"
 import { vi } from "vitest"
-import { prisma } from "config/prisma.js"
+import { prisma } from "../prisma.js"
+
+vi.mock("../prisma.js", () => ({ prisma: mockDeep() }))
 
 beforeEach(() => {
-    mockReset(prisma)
+    mockReset(prismaMock)
 })
 
-vi.mock("config/prisma.js", () => ({ prisma: mockDeep() }))
-export default prisma
+const prismaMock = prisma
+
+export default prismaMock
