@@ -21,53 +21,86 @@ export const getPosts = async ({
     tags = [],
     includeBody = true,
 } = {}) => {
-    page = Math.max(page, 1)
+    const whereQuery = buildGetPostsQuery(q, publishedOnly, authorId, tags)
+    const queryOptions = buildGetPostsQueryOptions(
+        whereQuery,
+        sortBy,
+        page,
+        pageSize,
+        includeBody
+    )
 
+    let [posts, countPosts] = await prisma.$transaction([
+        prisma.post.findMany(queryOptions),
+        prisma.post.count({
+            where: whereQuery,
+        }),
+    ])
+
+    posts = posts.map((p) => {
+        const { _count, ...post } = p
+        return {
+            ...post,
+            commentsCount: _count.comments,
+        }
+    })
+
+    return { posts, count: countPosts }
+}
+
+function buildGetPostsQuery(
+    q,
+    publishedOnly = true,
+    authorId = undefined,
+    tags = []
+) {
     const tagIds = tags.filter((t) => typeof t === "number")
     const tagSlugs = tags.filter((t) => typeof t === "string")
 
     const whereQuery = {
-        ...(q && {
-            title: {
-                contains: q,
-                mode: "insensitive",
-            },
-        }),
-        ...(publishedOnly && {
-            publishedAt: {
-                not: null,
-            },
-        }),
         authorId,
-        ...(tags.length > 0 && {
-            tags: {
-                some: {
-                    OR: [
-                        {
-                            id: { in: tagIds },
-                        },
-                        {
-                            slug: { in: tagSlugs },
-                        },
-                    ],
-                },
-            },
-        }),
     }
 
+    if (q) {
+        whereQuery.title = {
+            contains: q,
+            mode: "insensitive",
+        }
+    }
+
+    if (publishedOnly) {
+        whereQuery.publishedAt = {
+            not: null,
+        }
+    }
+
+    if (tags && tags.length > 0) {
+        whereQuery.tags = {
+            some: {
+                OR: [
+                    {
+                        id: { in: tagIds },
+                    },
+                    {
+                        slug: { in: tagSlugs },
+                    },
+                ],
+            },
+        }
+    }
+
+    return whereQuery
+}
+
+function buildGetPostsQueryOptions(
+    whereQuery,
+    sortBy = SortByValues.publishedAtDesc,
+    page = 1,
+    pageSize = -1,
+    includeBody = true
+) {
     const queryOptions = {
         where: whereQuery,
-        orderBy: {
-            ...((sortBy === SortByValues.publishedAtAsc ||
-                sortBy === SortByValues.publishedAtDesc) && {
-                publishedAt:
-                    sortBy === SortByValues.publishedAtAsc ? "asc" : "desc",
-            }),
-            ...((sortBy === SortByValues.idAsc ||
-                sortBy === SortByValues.idDesc) && {
-                id: sortBy === SortByValues.idAsc ? "asc" : "desc",
-            }),
-        },
         include: {
             _count: {
                 select: {
@@ -88,27 +121,38 @@ export const getPosts = async ({
         },
     }
 
+    switch (sortBy) {
+        case SortByValues.publishedAtAsc:
+            queryOptions.orderBy = {
+                publishedAt: "asc",
+            }
+            break
+        case SortByValues.publishedAtDesc:
+            queryOptions.orderBy = {
+                publishedAt: "desc",
+            }
+            break
+        case SortByValues.idAsc:
+            queryOptions.orderBy = {
+                id: "asc",
+            }
+            break
+        case SortByValues.idDesc:
+            queryOptions.orderBy = {
+                id: "desc",
+            }
+            break
+        default:
+            break
+    }
+
+    page = Math.max(page, 1)
     if (pageSize > 0) {
         queryOptions.skip = (page - 1) * pageSize
         queryOptions.take = pageSize
     }
 
-    let [posts, countPosts] = await prisma.$transaction([
-        prisma.post.findMany(queryOptions),
-        prisma.post.count({
-            where: whereQuery,
-        }),
-    ])
-
-    posts = posts.map((p) => {
-        const { _count, ...post } = p
-        return {
-            ...post,
-            commentsCount: _count.comments,
-        }
-    })
-
-    return { posts, count: countPosts }
+    return queryOptions
 }
 
 export const createPost = async (title, authorId) => {
@@ -124,67 +168,83 @@ export const createPost = async (title, authorId) => {
 }
 
 export const updatePost = async ({ postId, title, body, tags }) => {
-    let description = undefined
-    let readingTime = 1
+    if (!postId) {
+        throw new Error("Invalid post id")
+    }
+
+    const queryUpdateData = {
+        ...(title && { title }),
+        ...(body && { body }),
+    }
+    const querySelect = {
+        id: true,
+        title: !!title,
+        body: !!body,
+    }
 
     if (body) {
-        // https://github.com/ejrbuss/markdown-to-txt/blob/main/src/markdown-to-txt.ts
-        const plainBody = marked(body, {
-            renderer: plainTextRenderer,
-        })
-        const window = new JSDOM("").window
-        const purify = DOMPurify(window)
-        const sanitizedBody = purify.sanitize(plainBody)
-        // Get first 50 words from body to use as description
-        description = sanitizedBody
-        const descrMatch = sanitizedBody.match(/(^(?:\S+\s*){1,50}).*/)
-        if (descrMatch) {
-            description = `${descrMatch[1]}...`
-        }
+        const { description, readingTime } = parseBody(body)
 
-        // Reading time estimation
-        const bodyWords = plainBody.match(/\S+/g)
-        if (bodyWords) {
-            // 200 words per minute
-            readingTime = Math.max(bodyWords.length / 200, 1)
+        queryUpdateData.description = description
+        queryUpdateData.readingTime = readingTime
+
+        querySelect.description = true
+        querySelect.readingTime = true
+    }
+
+    if (tags && tags.length > 0) {
+        queryUpdateData.tags = {
+            set: tags.map((t) => {
+                if (typeof t === "string") {
+                    return {
+                        slug: t,
+                    }
+                }
+                return {
+                    id: t,
+                }
+            }),
         }
+        querySelect.tags = true
     }
 
     const updatedPost = await prisma.post.update({
         where: {
             id: postId,
         },
-        data: {
-            ...(title && { title }),
-            ...(body && { body }),
-            ...(description && { description }),
-            ...(tags && {
-                tags: {
-                    set: tags.map((t) => {
-                        if (typeof t === "string") {
-                            return {
-                                slug: t,
-                            }
-                        }
-                        return {
-                            id: t,
-                        }
-                    }),
-                },
-            }),
-            ...(body && { readingTime }),
-        },
-        select: {
-            id: true,
-            title: !!title,
-            body: !!body,
-            description: !!description,
-            tags: !!tags,
-            readingTime: !!body,
-        },
+        data: queryUpdateData,
+        select: querySelect,
     })
 
     return updatedPost
+}
+
+function estimateReadingTime(postPlainBody) {
+    const bodyWords = postPlainBody.match(/\S+/g)
+    // 200 words per minute or 1 minute by default
+    return bodyWords ? Math.max(bodyWords.length / 200, 1) : 1
+}
+
+function parseBody(body) {
+    // https://github.com/ejrbuss/markdown-to-txt/blob/main/src/markdown-to-txt.ts
+    const plainBody = marked(body, {
+        renderer: plainTextRenderer,
+    })
+    const window = new JSDOM("").window
+    const purify = DOMPurify(window)
+    const sanitizedBody = purify.sanitize(plainBody)
+
+    // Get first 50 words from body to use as description
+    let description = sanitizedBody
+    const descrMatch = sanitizedBody.match(/(^(?:\S+\s*){1,50}).*/)
+    if (descrMatch) {
+        description = `${descrMatch[1].trim()}...`
+    }
+
+    // Reading time estimation
+    const readingTime = estimateReadingTime(plainBody)
+
+    return { description, readingTime }
 }
 
 export const deletePost = async (postId) => {
