@@ -90,7 +90,7 @@ export const updatePost = async (req, res, next) => {
             body,
         })
 
-        return res.status(200).send(updatedPost)
+        return res.status(200).json(updatedPost)
     } catch (error) {
         next(error)
     }
@@ -110,9 +110,9 @@ export const deletePost = async (req, res, next) => {
             throw new createHttpError.Forbidden()
         }
 
-        await postsService.deletePost(postId)
+        const deletedPost = await postsService.deletePost(postId)
 
-        return res.status(204).send()
+        return res.status(200).json(deletedPost)
     } catch (error) {
         next(error)
     }
@@ -181,7 +181,7 @@ export const getPostComments = async (req, res, next) => {
 
         const { comments } = post
 
-        return res.json({
+        return res.status(200).json({
             metadata: {
                 count: comments.length,
             },
