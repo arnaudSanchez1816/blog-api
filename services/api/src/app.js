@@ -1,8 +1,12 @@
-import "dotenv/config"
+import { config } from "dotenv"
+config({
+    path: [`.env.${process.env.NODE_ENV}`, ".env"],
+})
 import cookieParser from "cookie-parser"
 import express from "express"
 import helmet from "helmet"
 import pinoHttp from "pino-http"
+import { pino } from "./config/pino.js"
 import createHttpError from "http-errors"
 import signupRouter from "./signup/signupRouter.js"
 import authRouter from "./auth/authRouter.js"
@@ -16,7 +20,7 @@ import { errorHandler } from "./middlewares/errorHandler.js"
 
 const app = express()
 
-app.use(pinoHttp())
+app.use(pinoHttp({ logger: pino }))
 app.disable("x-powered-by")
 app.use(helmet())
 app.use(express.json())
