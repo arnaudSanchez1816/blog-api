@@ -1,17 +1,20 @@
 import { prisma } from "../config/prisma.js"
 import bcrypt from "bcryptjs"
 
-export const getUserByEmail = async (email) => {
+export const getUserByEmail = async (email, { includePassword = false }) => {
     const user = await prisma.user.findUnique({
         where: {
             email: email,
+        },
+        omit: {
+            password: includePassword,
         },
     })
 
     return user
 }
 
-export const getUserById = async (id) => {
+export const getUserById = async (id, { includePassword = false }) => {
     const user = await prisma.user.findUnique({
         where: {
             id: id,
@@ -20,6 +23,9 @@ export const getUserById = async (id) => {
             roles: {
                 include: { permissions: true },
             },
+        },
+        omit: {
+            password: includePassword,
         },
     })
 

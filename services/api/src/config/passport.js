@@ -59,7 +59,9 @@ const localStrategy = new LocalStrategy(
     },
     async (username, password, done) => {
         try {
-            const user = await userService.getUserByEmail(username)
+            const user = await userService.getUserByEmail(username, {
+                includePassword: true,
+            })
             if (!user) {
                 return done(new SignInError(LOCAL_AUTH_ERROR_MESSAGE), false)
             }
@@ -74,7 +76,7 @@ const localStrategy = new LocalStrategy(
 
             return done(null, user)
         } catch (error) {
-            done(error, false)
+            done(error)
         }
     }
 )
