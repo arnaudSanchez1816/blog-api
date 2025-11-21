@@ -7,7 +7,7 @@ export const getUserByEmail = async (email, { includePassword = false }) => {
             email: email,
         },
         omit: {
-            password: includePassword,
+            password: !includePassword,
         },
     })
 
@@ -25,7 +25,7 @@ export const getUserById = async (id, { includePassword = false }) => {
             },
         },
         omit: {
-            password: includePassword,
+            password: !includePassword,
         },
     })
 
