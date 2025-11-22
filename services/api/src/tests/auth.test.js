@@ -5,24 +5,27 @@ import bcryptjs from "bcryptjs"
 import jwt from "jsonwebtoken"
 import { REFRESH_TOKEN_COOKIE } from "../config/passport.js"
 import { extractCookies, parseSigned } from "./helpers/extract-cookies.js"
+import { sign } from "cookie-signature"
 
 describe("/auth", () => {
-    describe("[POST] /auth/login", () => {
-        const userEmail = "user@email.com"
-        const userPassword = "password"
-        beforeEach(async () => {
-            const hashedPassword = bcryptjs.hashSync(
-                userPassword,
-                +process.env.PASSWORD_SALT_LENGTH
-            )
-            await prisma.user.create({
-                data: {
-                    email: userEmail,
-                    name: "user",
-                    password: hashedPassword,
-                },
-            })
+    const userEmail = "user@email.com"
+    const userPassword = "password"
+
+    beforeEach(async () => {
+        const hashedPassword = bcryptjs.hashSync(
+            userPassword,
+            +process.env.PASSWORD_SALT_LENGTH
+        )
+        await prisma.user.create({
+            data: {
+                email: userEmail,
+                name: "user",
+                password: hashedPassword,
+            },
         })
+    })
+
+    describe("[POST] /auth/login", () => {
         it("should respond 200 and send the user details", async () => {
             const { status, body } = await api.post(v1Api("/auth/login")).send({
                 email: userEmail,
@@ -102,6 +105,82 @@ describe("/auth", () => {
             expect(errorMessage).not.toBeNull()
             expect(details).toHaveProperty("email")
             expect(details).toHaveProperty("password")
+        })
+    })
+
+    describe("[GET] /auth/token", () => {
+        it("should respond 200 and send a valid JWT access token", async () => {
+            const refreshToken = jwt.sign(
+                {
+                    sub: 1,
+                    name: "username",
+                    email: "user@email.com",
+                },
+                process.env.JWT_REFRESH_SECRET
+            )
+
+            const { status, body } = await api
+                .get(v1Api("/auth/token"))
+                .set("Cookie", [
+                    `${REFRESH_TOKEN_COOKIE}=s:${sign(refreshToken, process.env.SIGNED_COOKIE_SECRET)}`,
+                ])
+
+            expect(status).toBe(200)
+            expect(body).toHaveProperty("accessToken")
+            const { accessToken } = body
+            expect(
+                jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET)
+            ).not.toBeNull()
+        })
+
+        it("should respond with 401 if the user of the refresh token does not exists", async () => {
+            const refreshToken = jwt.sign(
+                {
+                    sub: 2,
+                    name: "otherUser",
+                    email: "user2@email.com",
+                },
+                process.env.JWT_REFRESH_SECRET
+            )
+
+            const { status } = await api
+                .get(v1Api("/auth/token"))
+                .set("Cookie", [
+                    `${REFRESH_TOKEN_COOKIE}=s:${sign(refreshToken, process.env.SIGNED_COOKIE_SECRET)}`,
+                ])
+
+            expect(status).toBe(401)
+        })
+
+        it("should respond with 401 if the refresh token is expired", async () => {
+            const refreshToken = jwt.sign(
+                {
+                    sub: 1,
+                    name: "username",
+                    email: "user@email.com",
+                },
+                process.env.JWT_REFRESH_SECRET,
+                {
+                    expiresIn: "100ms",
+                }
+            )
+
+            // Wait for token to expire
+            await new Promise((res) => setTimeout(res, 500))
+
+            const { status } = await api
+                .get(v1Api("/auth/token"))
+                .set("Cookie", [
+                    `${REFRESH_TOKEN_COOKIE}=s:${sign(refreshToken, process.env.SIGNED_COOKIE_SECRET)}`,
+                ])
+
+            expect(status).toBe(401)
+        })
+
+        it("should respond with 401 if the refresh token is missing", async () => {
+            const { status } = await api.get(v1Api("/auth/token"))
+
+            expect(status).toBe(401)
         })
     })
 })
