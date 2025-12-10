@@ -12,10 +12,12 @@ export const getCurrentUser = async (req, res, next) => {
         const { password, ...userDetails } = req.user
 
         // Map roles to omit Permissions details
-        userDetails.roles = userDetails.roles.map((role) => ({
-            id: role.id,
-            name: role.name,
-        }))
+        if (userDetails.roles) {
+            userDetails.roles = userDetails.roles.map((role) => ({
+                id: role.id,
+                name: role.name,
+            }))
+        }
 
         return res.status(200).json(userDetails)
     } catch (error) {
