@@ -1,38 +1,53 @@
 import * as postsService from "../posts/postsService.js"
-import * as usersService from "../users/usersService.js"
+import * as usersService from "./usersService.js"
 import createHttpError from "http-errors"
+import type { Request, Response, NextFunction } from "express"
+import type { ApiUser } from "../types/apiUser.js"
 
-export const getCurrentUser = async (req, res, next) => {
+export const getCurrentUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
     try {
         if (!req.user) {
             throw new createHttpError.Unauthorized()
         }
 
         // Omit password
-        const { password, ...userDetails } = req.user
+        const { password, ...userDetails } = req.user as ApiUser
 
         // Map roles to omit Permissions details
+        let userRoles: { id: number; name: string }[] = []
         if (userDetails.roles) {
-            userDetails.roles = userDetails.roles.map((role) => ({
+            userRoles = userDetails.roles.map((role) => ({
                 id: role.id,
                 name: role.name,
             }))
         }
+        const userDetailsToSend = {
+            ...userDetails,
+            roles: userRoles,
+        }
 
-        return res.status(200).json(userDetails)
+        return res.status(200).json(userDetailsToSend)
     } catch (error) {
         next(error)
     }
 }
 
-export const getCurrentUserPosts = async (req, res, next) => {
+export const getCurrentUserPosts = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
     try {
         if (!req.user) {
             throw new createHttpError.Unauthorized()
         }
 
         const { q, page, pageSize, sortBy, tags } = req.query
-        const { id: userId } = req.user
+        const { id: userId } = req.user as ApiUser
 
         const { posts, count } = await postsService.getPosts({
             q,
@@ -58,7 +73,11 @@ export const getCurrentUserPosts = async (req, res, next) => {
     }
 }
 
-export const createUser = async (req, res, next) => {
+export const createUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
     try {
         const { email, password, name, role } = req.body
         const newUser = await usersService.createUser({
@@ -68,8 +87,9 @@ export const createUser = async (req, res, next) => {
             roleName: role,
         })
 
-        const { password: userPassword, ...newUserDetails } = newUser
-        return res.status(201).json(newUserDetails)
+        const { password: hashedPassword, ...userDetails } = newUser
+
+        return res.status(201).json(userDetails)
     } catch (error) {
         next(error)
     }

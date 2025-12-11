@@ -28,6 +28,18 @@ describe("usersController", () => {
                 name: "username",
                 email: "email",
                 password: "password",
+                roles: [
+                    {
+                        id: 1,
+                        name: "admin",
+                        permissions: [
+                            {
+                                id: 1,
+                                type: "CREATE",
+                            },
+                        ],
+                    },
+                ],
             }
 
             await UsersController.getCurrentUser(request, response, next)
@@ -37,6 +49,7 @@ describe("usersController", () => {
                 id: 1,
                 name: "username",
                 email: "email",
+                roles: [{ id: 1, name: "admin" }],
             })
         })
 

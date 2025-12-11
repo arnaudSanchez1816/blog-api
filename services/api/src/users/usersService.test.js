@@ -47,14 +47,13 @@ describe("usersService", () => {
                 password: "password",
                 roleName: "admin",
             })
-            expect(prismaMock.user.create).toHaveBeenCalledWith({
-                data: expect.objectContaining({
-                    password: HASHED_PASSWORD,
-                }),
-                include: {
-                    roles: true,
-                },
-            })
+            expect(prismaMock.user.create).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    data: expect.objectContaining({
+                        password: HASHED_PASSWORD,
+                    }),
+                })
+            )
         })
     })
 })

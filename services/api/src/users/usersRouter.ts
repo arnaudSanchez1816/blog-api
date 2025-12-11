@@ -14,7 +14,7 @@ import {
 import { checkPermission } from "../middlewares/checkPermission.js"
 import { PermissionType } from "@prisma/client"
 
-const router = Router()
+const router: Router = Router()
 
 // /users/me
 const meRouter = Router()

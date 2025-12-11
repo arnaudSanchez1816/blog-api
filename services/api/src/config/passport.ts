@@ -1,12 +1,16 @@
 import passport from "passport"
-import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt"
+import {
+    Strategy as JwtStrategy,
+    ExtractJwt,
+    type VerifiedCallback,
+} from "passport-jwt"
 import { Strategy as LocalStrategy } from "passport-local"
 import { Strategy as AnonymousStrategy } from "passport-anonymous"
 import bcrypt from "bcryptjs"
 import * as userService from "../users/usersService.js"
 import { SignInError } from "../lib/errors.js"
 
-const checkJwtUser = async (jwtPayload, done) => {
+const checkJwtUser = async (jwtPayload: any, done: VerifiedCallback) => {
     try {
         const user = await userService.getUserById(jwtPayload.sub)
 
@@ -23,7 +27,7 @@ const checkJwtUser = async (jwtPayload, done) => {
 const jwtStrategy = new JwtStrategy(
     {
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-        secretOrKey: process.env.JWT_ACCESS_SECRET,
+        secretOrKey: process.env.JWT_ACCESS_SECRET!,
         algorithms: ["HS256"],
     },
     checkJwtUser
@@ -42,7 +46,7 @@ const jwtRefreshStrategy = new JwtStrategy(
                 return refreshToken
             },
         ]),
-        secretOrKey: process.env.JWT_REFRESH_SECRET,
+        secretOrKey: process.env.JWT_REFRESH_SECRET!,
         algorithms: ["HS256"],
     },
     checkJwtUser
