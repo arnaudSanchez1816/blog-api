@@ -6,9 +6,9 @@
     "type": "module",
     "private": true,
     "scripts": {
-        "dev": "node --watch ./src/index.js | pnpx pino-pretty",
-        "build": "pnpm run prisma:generate",
-        "start": "NODE_ENV=production node ./src/index.js | pnpx pino-pretty",
+        "dev": "NODE_ENV=development tsx --watch ./src/index.ts | pnpx pino-pretty",
+        "build": "tsc | pnpm run prisma:generate",
+        "start": "NODE_ENV=production node ./dist/index.js | pnpx pino-pretty",
         "lint": "eslint ./src",
         "test:unit": "NODE_ENV=test vitest run -c ./vitest.config.unit.js",
         "test:unit:watch": "NODE_ENV=test vitest --watch -c ./vitest.config.unit.js",
@@ -29,6 +29,8 @@
     "license": "ISC",
     "dependencies": {
         "@prisma/client": "~6.14",
+        "@types/express": "^5.0.6",
+        "@types/node": "^25.0.0",
         "bcryptjs": "^3.0.2",
         "cookie-parser": "^1.4.7",
         "cors": "^2.8.5",
@@ -51,6 +53,7 @@
     },
     "devDependencies": {
         "@repo/eslint-config": "workspace:*",
+        "@repo/typescript-config": "workspace:*",
         "@repo/zod-schemas": "workspace:*",
         "@vitest/eslint-plugin": "^1.4.2",
         "cookie-signature": "^1.2.2",
@@ -60,6 +63,8 @@
         "pino-pretty": "^13.1.1",
         "prisma": "~6.14",
         "supertest": "^7.1.4",
+        "tsx": "^4.21.0",
+        "typescript": "^5.9.3",
         "vitest": "^4.0.8",
         "vitest-mock-extended": "^3.1.0"
     },
