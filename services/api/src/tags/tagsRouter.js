@@ -19,7 +19,7 @@ import { checkPermission } from "../middlewares/checkPermission.js"
 
 const router = Router()
 
-router.get("/", validateRequest(getTagValidator), getTags)
+router.get("/", getTags)
 router.post(
     "/",
     passport.authenticate(strategies.jwt, { session: false }),
@@ -29,7 +29,7 @@ router.post(
 )
 router
     .route("/:id")
-    .get(getTag)
+    .get(validateRequest(getTagValidator), getTag)
     .put(
         passport.authenticate(strategies.jwt, { session: false }),
         checkPermission("UPDATE"),
