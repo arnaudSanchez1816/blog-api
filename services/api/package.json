@@ -14,12 +14,12 @@
         "test:unit:watch": "NODE_ENV=test vitest --watch -c ./vitest.config.unit.js",
         "test:int": "NODE_ENV=test ./scripts/run-integration.sh",
         "test:int:ui": "NODE_ENV=test ./scripts/run-integration.sh --ui",
-        "prisma:migrate": "pnpx prisma migrate dev",
-        "prisma:seed": "pnpx prisma db seed",
-        "prisma:push": "pnpx prisma db push",
-        "prisma:reset": "pnpx prisma migrate reset",
-        "prisma:generate": "pnpx prisma generate --schema=./prisma/schema.prisma",
-        "prisma:deploy": "pnpx prisma migrate deploy"
+        "prisma:migrate": "prisma migrate dev",
+        "prisma:seed": "prisma db seed",
+        "prisma:push": "prisma db push",
+        "prisma:reset": "prisma migrate reset",
+        "prisma:generate": "prisma generate --schema=./prisma/schema.prisma",
+        "prisma:deploy": "prisma migrate deploy"
     },
     "prisma": {
         "seed": "node prisma/seeding/seed.js"
