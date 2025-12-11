@@ -58,6 +58,8 @@
         "@types/cookie-parser": "^1.4.10",
         "@types/cors": "^2.8.19",
         "@types/http-errors": "^2.0.5",
+        "@types/lodash": "^4.17.21",
+        "@types/passport": "^1.0.17",
         "@vitest/eslint-plugin": "^1.4.2",
         "cookie-signature": "^1.2.2",
         "cookiejar": "^2.1.4",
