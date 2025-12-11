@@ -20,16 +20,6 @@ export const config = [
     },
     eslintConfigPrettier,
     {
-        rules: {
-            "n/no-unpublished-import": [
-                "error",
-                {
-                    ignorePrivate: true,
-                },
-            ],
-        },
-    },
-    {
         plugins: {
             turbo: turboPlugin,
         },

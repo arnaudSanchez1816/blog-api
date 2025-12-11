@@ -14,16 +14,6 @@ export const config = [
     nodePlugin.configs["flat/recommended-module"],
     eslintConfigPrettier,
     {
-        rules: {
-            "n/no-unpublished-import": [
-                "error",
-                {
-                    ignorePrivate: true,
-                },
-            ],
-        },
-    },
-    {
         plugins: {
             turbo: turboPlugin,
         },
