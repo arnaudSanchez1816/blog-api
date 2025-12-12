@@ -3,6 +3,11 @@ import * as usersService from "./usersService.js"
 import createHttpError from "http-errors"
 import type { Request, Response, NextFunction } from "express"
 import type { ApiUser } from "../types/apiUser.js"
+import type z from "zod"
+import type {
+    createUserValidator,
+    getCurrentUserPostsValidator,
+} from "./usersValidators.js"
 
 export const getCurrentUser = async (
     req: Request,
@@ -36,8 +41,9 @@ export const getCurrentUser = async (
     }
 }
 
+type GetCurrentUserPostsSchema = z.infer<typeof getCurrentUserPostsValidator>
 export const getCurrentUserPosts = async (
-    req: Request,
+    req: Request<any, any, any, GetCurrentUserPostsSchema["query"]>,
     res: Response,
     next: NextFunction
 ) => {
@@ -73,8 +79,9 @@ export const getCurrentUserPosts = async (
     }
 }
 
+type CreateUserSchema = z.infer<typeof createUserValidator>
 export const createUser = async (
-    req: Request,
+    req: Request<any, any, CreateUserSchema["body"]>,
     res: Response,
     next: NextFunction
 ) => {
