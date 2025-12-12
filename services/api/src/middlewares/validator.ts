@@ -31,7 +31,7 @@ export const validateRequest =
         validator: ZodRequestObject
     ) =>
     async (
-        req: Request<TParams, any, TQuery, TBody, any>,
+        req: Request<TParams, any, TBody, TQuery, any>,
         res: Response,
         next: NextFunction
     ) => {
