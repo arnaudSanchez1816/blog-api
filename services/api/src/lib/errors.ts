@@ -3,7 +3,7 @@ export class BaseError extends Error {
     constructor(
         errorMessage: string,
         statusCode: number,
-        { name = "BaseError", cause = null }
+        { name = "BaseError", cause }: { name?: string; cause?: Error }
     ) {
         super(errorMessage, { cause })
         this.statusCode = statusCode
@@ -19,7 +19,7 @@ export class BaseError extends Error {
 }
 
 export class NotFoundError extends BaseError {
-    constructor(errorMessage = "Not found", statusCode = 404, cause = null) {
+    constructor(errorMessage = "Not found", statusCode = 404, cause?: Error) {
         super(errorMessage, statusCode, { name: "NotFoundError", cause })
     }
 }
@@ -28,7 +28,7 @@ export class SignInError extends BaseError {
     constructor(
         errorMessage = "Invalid email or password",
         statusCode = 401,
-        cause = null
+        cause?: Error
     ) {
         super(errorMessage, statusCode, { name: "SignInError", cause })
     }
@@ -40,7 +40,7 @@ export class ValidationError extends BaseError {
         errorMessage = "Field is invalid",
         statusCode = 400,
         details = {},
-        cause = null
+        cause?: Error
     ) {
         super(errorMessage, statusCode, { name: "AlreadyExistsError", cause })
         this.details = details
@@ -59,7 +59,7 @@ export class UniqueConstraintError extends BaseError {
     constructor(
         errorMessage = "Resource already exists",
         statusCode = 400,
-        cause = null
+        cause?: Error
     ) {
         super(errorMessage, statusCode, { name: "UniqueResourceError", cause })
     }
