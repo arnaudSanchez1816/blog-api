@@ -10,7 +10,11 @@ import type { ApiUser } from "../types/apiUser.js"
  */
 export const checkPermission =
     (permission: PermissionType) =>
-    (req: Request, res: Response, next: NextFunction) => {
+    (
+        req: Request<unknown, any, unknown, unknown>,
+        res: Response,
+        next: NextFunction
+    ) => {
         try {
             const user = req.user as ApiUser
             if (!user) {
