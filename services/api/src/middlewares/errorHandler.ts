@@ -4,11 +4,17 @@ import BaseError, { ValidationError } from "../lib/errors.js"
 import z, { ZodError } from "zod"
 import createHttpError from "http-errors"
 import { Prisma } from "@prisma/client"
+import type { Request, Response, NextFunction } from "express"
 
-export const errorHandler = (error, req, res, next) => {
+export const errorHandler = (
+    error: Error,
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
     pino.error(error)
 
-    let handledError
+    let handledError: BaseError | undefined
 
     if (error instanceof ZodError) {
         handledError = new ValidationError(
@@ -33,11 +39,9 @@ export const errorHandler = (error, req, res, next) => {
         error instanceof BaseError
             ? error
             : (handledError ??
-              new BaseError(
-                  "Something went wrong",
-                  500,
-                  shouldSendCause && { cause: error }
-              ))
+              new BaseError("Something went wrong", 500, {
+                  cause: shouldSendCause ? error : undefined,
+              }))
 
     return res
         .status(errorResponse.statusCode)
