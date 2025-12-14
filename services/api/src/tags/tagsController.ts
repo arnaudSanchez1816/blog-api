@@ -62,10 +62,14 @@ export const createTag = async (
 
         return res.status(201).json(newTag)
     } catch (error) {
-        const handledError = handlePrismaKnownErrors(error)
-        if (handledError instanceof UniqueConstraintError) {
-            const message = `Tag with slug "${slug} already exists"`
-            return next(new ValidationError(message, 400, { slug: message }))
+        if (error instanceof Error) {
+            const handledError = handlePrismaKnownErrors(error)
+            if (handledError instanceof UniqueConstraintError) {
+                const message = `Tag with slug "${slug} already exists"`
+                return next(
+                    new ValidationError(message, 400, { slug: message })
+                )
+            }
         }
         next(error)
     }
