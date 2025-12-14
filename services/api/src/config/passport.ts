@@ -87,13 +87,14 @@ const localStrategy = new LocalStrategy(
 passport.use(localStrategy)
 
 const anonymousStrategy = new AnonymousStrategy()
+anonymousStrategy.name = "anonymous"
 passport.use(anonymousStrategy)
 
 export const strategies = {
     local: localStrategy.name,
     jwt: jwtStrategy.name,
     jwtRefresh: jwtRefreshStrategy.name,
-    anonymous: anonymousStrategy.name,
+    anonymous: anonymousStrategy.name!,
 }
 
 export default passport
