@@ -412,7 +412,7 @@ describe("postsController", () => {
 
             await PostsController.updatePost(request, response, next)
             expect(PostsService.updatePost).toHaveBeenCalledWith({
-                postId: request.params.id,
+                id: request.params.id,
                 title: request.body.title,
                 body: request.body.body,
                 tags: request.body.tags,
@@ -479,7 +479,7 @@ describe("postsController", () => {
             expect(PostsService.getPostDetails).toHaveBeenCalledWith(100)
             expect(PostsService.updatePost).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    postId: 100,
+                    id: 100,
                 })
             )
         })

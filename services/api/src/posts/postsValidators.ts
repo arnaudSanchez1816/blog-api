@@ -21,9 +21,12 @@ export const getPostsValidator = z.object({
             .default(20)
             .catch(20),
         tags: z
-            .string()
-            .transform((val) => val.split(","))
-            .pipe(postSchema.shape.tags)
+            .preprocess((val) => {
+                if (typeof val === "string") {
+                    return val.split(",")
+                }
+                return val
+            }, postSchema.shape.tags)
             .optional()
             .default([])
             .catch([]),

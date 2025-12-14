@@ -1,11 +1,30 @@
 import * as postsService from "./postsService.js"
 import * as commentsService from "../comments/commentsService.js"
 import createHttpError from "http-errors"
+import type { Request, Response, NextFunction } from "express"
+import type z from "zod"
+import type {
+    createPostCommentValidator,
+    createPostValidator,
+    deletePostValidator,
+    getPostCommentsValidator,
+    getPostsValidator,
+    getPublishedPostValidator,
+    hidePostValidator,
+    publishPostValidator,
+    updatePostValidator,
+} from "./postsValidators.js"
+import type { ApiUser } from "../types/apiUser.js"
 
-export const getPost = async (req, res, next) => {
+type GetPostSchema = z.infer<typeof getPublishedPostValidator>
+export const getPost = async (
+    req: Request<GetPostSchema["params"]>,
+    res: Response,
+    next: NextFunction
+) => {
     try {
         const { id } = req.params
-        const { id: userId } = req.user || {}
+        const { id: userId } = (req.user as ApiUser) || {}
 
         const post = await postsService.getPostDetails(id, {
             includeTags: true,
@@ -22,10 +41,15 @@ export const getPost = async (req, res, next) => {
     }
 }
 
-export const getPosts = async (req, res, next) => {
+type GetPostsSchema = z.infer<typeof getPostsValidator>
+export const getPosts = async (
+    req: Request<any, any, any, GetPostsSchema["query"]>,
+    res: Response,
+    next: NextFunction
+) => {
     try {
         const { q, page, pageSize, sortBy, tags, unpublished } = req.query
-        const { id: userId } = req.user || {}
+        const { id: userId } = (req.user as ApiUser) || {}
         const publishedOnly = userId ? !unpublished : true
 
         const { posts, count } = await postsService.getPosts({
@@ -55,10 +79,20 @@ export const getPosts = async (req, res, next) => {
     }
 }
 
-export const createPost = async (req, res, next) => {
+type CreatePostSchema = z.infer<typeof createPostValidator>
+export const createPost = async (
+    req: Request<any, any, CreatePostSchema["body"]>,
+    res: Response,
+    next: NextFunction
+) => {
     try {
+        const user = req.user as ApiUser
+        if (!user) {
+            throw new createHttpError.Unauthorized()
+        }
+
         const { title } = req.body
-        const userId = req.user.id
+        const { id: userId } = user
 
         const createdPost = await postsService.createPost(title, userId)
 
@@ -68,11 +102,21 @@ export const createPost = async (req, res, next) => {
     }
 }
 
-export const updatePost = async (req, res, next) => {
+type UpdatePostSchema = z.infer<typeof updatePostValidator>
+export const updatePost = async (
+    req: Request<UpdatePostSchema["params"], any, UpdatePostSchema["body"]>,
+    res: Response,
+    next: NextFunction
+) => {
     try {
+        const user = req.user as ApiUser
+        if (!user) {
+            throw new createHttpError.Unauthorized()
+        }
+
         const { title, body, tags } = req.body
         const { id: postId } = req.params
-        const { id: userId } = req.user
+        const { id: userId } = user
 
         const post = await postsService.getPostDetails(postId)
         if (!post) {
@@ -84,7 +128,7 @@ export const updatePost = async (req, res, next) => {
         }
 
         const updatedPost = await postsService.updatePost({
-            postId,
+            id: postId,
             title,
             tags,
             body,
@@ -95,11 +139,20 @@ export const updatePost = async (req, res, next) => {
         next(error)
     }
 }
-
-export const deletePost = async (req, res, next) => {
+type DeletePostSchema = z.infer<typeof deletePostValidator>
+export const deletePost = async (
+    req: Request<DeletePostSchema["params"]>,
+    res: Response,
+    next: NextFunction
+) => {
     try {
+        const user = req.user as ApiUser
+        if (!user) {
+            throw new createHttpError.Unauthorized()
+        }
+
         const { id: postId } = req.params
-        const { id: userId } = req.user
+        const { id: userId } = user
 
         const post = await postsService.getPostDetails(postId)
         if (!post) {
@@ -118,10 +171,21 @@ export const deletePost = async (req, res, next) => {
     }
 }
 
-export const publishPost = async (req, res, next) => {
+type PublishPostSchema = z.infer<typeof publishPostValidator>
+export const publishPost = async (
+    req: Request<PublishPostSchema["params"]>,
+    res: Response,
+    next: NextFunction
+) => {
     try {
+        const user = req.user as ApiUser
+        if (!user) {
+            throw new createHttpError.Unauthorized()
+        }
+
         const { id: postId } = req.params
-        const { id: userId } = req.user
+        const { id: userId } = user
+
         const post = await postsService.getPostDetails(postId)
         if (!post) {
             throw new createHttpError.NotFound()
@@ -141,10 +205,21 @@ export const publishPost = async (req, res, next) => {
     }
 }
 
-export const hidePost = async (req, res, next) => {
+type HidePostSchema = z.infer<typeof hidePostValidator>
+export const hidePost = async (
+    req: Request<HidePostSchema["params"]>,
+    res: Response,
+    next: NextFunction
+) => {
     try {
+        const user = req.user as ApiUser
+        if (!user) {
+            throw new createHttpError.Unauthorized()
+        }
+
         const { id: postId } = req.params
-        const { id: userId } = req.user
+        const { id: userId } = user
+
         const post = await postsService.getPostDetails(postId)
         if (!post) {
             throw new createHttpError.NotFound()
@@ -164,10 +239,16 @@ export const hidePost = async (req, res, next) => {
     }
 }
 
-export const getPostComments = async (req, res, next) => {
+type GetPostCommentsSchema = z.infer<typeof getPostCommentsValidator>
+export const getPostComments = async (
+    req: Request<GetPostCommentsSchema["params"]>,
+    res: Response,
+    next: NextFunction
+) => {
     try {
         const { id: postId } = req.params
-        const { id: userId } = req.user || {}
+        const { id: userId } = (req.user as ApiUser) || {}
+
         const post = await postsService.getPostDetails(postId, {
             includeComments: true,
         })
@@ -192,11 +273,20 @@ export const getPostComments = async (req, res, next) => {
     }
 }
 
-export const createPostComment = async (req, res, next) => {
+type CreatePostCommentSchema = z.infer<typeof createPostCommentValidator>
+export const createPostComment = async (
+    req: Request<
+        CreatePostCommentSchema["params"],
+        any,
+        CreatePostCommentSchema["body"]
+    >,
+    res: Response,
+    next: NextFunction
+) => {
     try {
         const { id: postId } = req.params
         const { username, body } = req.body
-        const { id: userId } = req.user || {}
+        const { id: userId } = (req.user as ApiUser) || {}
 
         const post = await postsService.getPostDetails(postId)
         if (!post) {

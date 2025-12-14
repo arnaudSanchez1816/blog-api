@@ -313,7 +313,7 @@ describe("postsService", () => {
         it("should update the post and return its updated data", async () => {
             const updatedPost = await PostsService.updatePost({
                 body: "updated body",
-                postId: 1,
+                id: 1,
                 tags: [1],
                 title: "updated title",
             })
@@ -342,7 +342,7 @@ describe("postsService", () => {
                 "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate..."
 
             const updatedPost = await PostsService.updatePost({
-                postId: 1,
+                id: 1,
                 body: sixtyWordsBody,
             })
 
@@ -358,7 +358,7 @@ describe("postsService", () => {
             const expectedDescription = `${body}...`
 
             const updatedPost = await PostsService.updatePost({
-                postId: 1,
+                id: 1,
                 body: body,
             })
 

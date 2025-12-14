@@ -1,14 +1,35 @@
 import { prisma } from "../config/prisma.js"
 import { JSDOM } from "jsdom"
 import DOMPurify from "dompurify"
-import { marked } from "marked"
+import { marked, Renderer } from "marked"
 import { plainTextRenderer } from "../helpers/markedPlainTextRenderer.js"
+import type { TagIdOrSlug } from "../types/tagIdOrSlug.js"
+import type { Post } from "@prisma/client"
+import { Prisma } from "@prisma/client"
+import type { Optional } from "../types/optional.js"
 
 export const SortByValues = {
     publishedAtAsc: "publishedAt",
     publishedAtDesc: "-publishedAt",
     idAsc: "id",
     idDesc: "-id",
+} as const
+
+type SortByValues = (typeof SortByValues)[keyof typeof SortByValues]
+
+// Also can works like this if SortByValues is not const
+// type SortByValuesType = Readonly<typeof SortByValues>
+// type Values = keyof SortByValuesType
+
+interface GetPostsOptions {
+    q?: string
+    sortBy?: SortByValues
+    page?: number
+    pageSize?: number
+    publishedOnly?: boolean
+    authorId?: number
+    tags?: TagIdOrSlug[]
+    includeBody?: boolean
 }
 
 export const getPosts = async ({
@@ -20,7 +41,7 @@ export const getPosts = async ({
     authorId = undefined,
     tags = [],
     includeBody = true,
-} = {}) => {
+}: GetPostsOptions = {}) => {
     const whereQuery = buildGetPostsQuery(q, publishedOnly, authorId, tags)
     const queryOptions = buildGetPostsQueryOptions(
         whereQuery,
@@ -30,14 +51,14 @@ export const getPosts = async ({
         includeBody
     )
 
-    let [posts, countPosts] = await prisma.$transaction([
+    let [postsQueried, countPosts] = await prisma.$transaction([
         prisma.post.findMany(queryOptions),
         prisma.post.count({
             where: whereQuery,
         }),
     ])
 
-    posts = posts.map((p) => {
+    const posts = postsQueried.map((p) => {
         const { _count, ...post } = p
         return {
             ...post,
@@ -49,15 +70,15 @@ export const getPosts = async ({
 }
 
 function buildGetPostsQuery(
-    q,
-    publishedOnly = true,
-    authorId = undefined,
-    tags = []
+    q?: string,
+    publishedOnly: boolean = true,
+    authorId?: number,
+    tags: TagIdOrSlug[] = []
 ) {
     const tagIds = tags.filter((t) => typeof t === "number")
     const tagSlugs = tags.filter((t) => typeof t === "string")
 
-    const whereQuery = {
+    const whereQuery: Prisma.PostWhereInput = {
         authorId,
     }
 
@@ -93,12 +114,46 @@ function buildGetPostsQuery(
 }
 
 function buildGetPostsQueryOptions(
-    whereQuery,
-    sortBy = SortByValues.publishedAtDesc,
+    whereQuery: Prisma.PostWhereInput,
+    sortBy: SortByValues = SortByValues.publishedAtDesc,
     page = 1,
     pageSize = -1,
     includeBody = true
 ) {
+    let orderBy: Prisma.PostOrderByWithRelationInput | undefined
+    switch (sortBy) {
+        case SortByValues.publishedAtAsc:
+            orderBy = {
+                publishedAt: "asc",
+            }
+            break
+        case SortByValues.publishedAtDesc:
+            orderBy = {
+                publishedAt: "desc",
+            }
+            break
+        case SortByValues.idAsc:
+            orderBy = {
+                id: "asc",
+            }
+            break
+        case SortByValues.idDesc:
+            orderBy = {
+                id: "desc",
+            }
+            break
+        default:
+            break
+    }
+
+    page = Math.max(page, 1)
+    let skip: number | undefined
+    let take: number | undefined
+    if (pageSize > 0) {
+        skip = (page - 1) * pageSize
+        take = pageSize
+    }
+
     const queryOptions = {
         where: whereQuery,
         include: {
@@ -114,48 +169,20 @@ function buildGetPostsQueryOptions(
                 },
             },
             tags: true,
-            authorId: false,
         },
         omit: {
             body: !includeBody,
+            authorId: false,
         },
-    }
-
-    switch (sortBy) {
-        case SortByValues.publishedAtAsc:
-            queryOptions.orderBy = {
-                publishedAt: "asc",
-            }
-            break
-        case SortByValues.publishedAtDesc:
-            queryOptions.orderBy = {
-                publishedAt: "desc",
-            }
-            break
-        case SortByValues.idAsc:
-            queryOptions.orderBy = {
-                id: "asc",
-            }
-            break
-        case SortByValues.idDesc:
-            queryOptions.orderBy = {
-                id: "desc",
-            }
-            break
-        default:
-            break
-    }
-
-    page = Math.max(page, 1)
-    if (pageSize > 0) {
-        queryOptions.skip = (page - 1) * pageSize
-        queryOptions.take = pageSize
-    }
+        orderBy,
+        skip,
+        take,
+    } satisfies Prisma.PostFindManyArgs
 
     return queryOptions
 }
 
-export const createPost = async (title, authorId) => {
+export const createPost = async (title: string, authorId: number) => {
     const createdPost = await prisma.post.create({
         data: {
             title: title,
@@ -167,16 +194,30 @@ export const createPost = async (title, authorId) => {
     return createdPost
 }
 
-export const updatePost = async ({ postId, title, body, tags }) => {
-    if (!postId) {
+interface UpdatePostDto
+    extends Optional<
+        Prisma.PostGetPayload<{
+            select: {
+                id: true
+                title: true
+                body: true
+            }
+        }>,
+        "title" | "body"
+    > {
+    tags?: TagIdOrSlug[]
+}
+
+export const updatePost = async ({ id, title, body, tags }: UpdatePostDto) => {
+    if (!id) {
         throw new Error("Invalid post id")
     }
 
-    const queryUpdateData = {
+    const queryUpdateData: Prisma.PostUpdateInput = {
         ...(title && { title }),
         ...(body && { body }),
     }
-    const querySelect = {
+    const querySelect: Prisma.PostSelect = {
         id: true,
         title: !!title,
         body: !!body,
@@ -210,7 +251,7 @@ export const updatePost = async ({ postId, title, body, tags }) => {
 
     const updatedPost = await prisma.post.update({
         where: {
-            id: postId,
+            id,
         },
         data: queryUpdateData,
         select: querySelect,
@@ -219,18 +260,20 @@ export const updatePost = async ({ postId, title, body, tags }) => {
     return updatedPost
 }
 
-function estimateReadingTime(postPlainBody) {
+function estimateReadingTime(postPlainBody: string) {
     const bodyWords = postPlainBody.match(/\S+/g)
     // 200 words per minute or 1 minute by default
     return bodyWords ? Math.max(bodyWords.length / 200, 1) : 1
 }
 
-function parseBody(body) {
+function parseBody(body: string) {
     // https://github.com/ejrbuss/markdown-to-txt/blob/main/src/markdown-to-txt.ts
     const plainBody = marked(body, {
-        renderer: plainTextRenderer,
+        renderer: plainTextRenderer as Renderer,
+        async: false,
     })
     const window = new JSDOM("").window
+    // @ts-expect-error
     const purify = DOMPurify(window)
     const sanitizedBody = purify.sanitize(plainBody)
 
@@ -238,7 +281,7 @@ function parseBody(body) {
     let description = sanitizedBody
     const descrMatch = sanitizedBody.match(/(^(?:\S+\s*){1,50}).*/)
     if (descrMatch) {
-        description = `${descrMatch[1].trim()}...`
+        description = `${descrMatch[1]?.trim()}...`
     }
 
     // Reading time estimation
@@ -247,7 +290,7 @@ function parseBody(body) {
     return { description, readingTime }
 }
 
-export const deletePost = async (postId) => {
+export const deletePost = async (postId: number) => {
     const deletedPost = await prisma.post.delete({
         where: {
             id: postId,
@@ -257,7 +300,7 @@ export const deletePost = async (postId) => {
     return deletedPost
 }
 
-export const publishPost = async (postId) => {
+export const publishPost = async (postId: number) => {
     const publishedPost = await prisma.post.update({
         where: {
             id: postId,
@@ -270,7 +313,7 @@ export const publishPost = async (postId) => {
     return publishedPost
 }
 
-export const hidePost = async (postId) => {
+export const hidePost = async (postId: number) => {
     const publishedPost = await prisma.post.update({
         where: {
             id: postId,
@@ -284,7 +327,7 @@ export const hidePost = async (postId) => {
 }
 
 export const getPostDetails = async (
-    postId,
+    postId: number,
     { includeComments = false, includeTags = false } = {}
 ) => {
     const { _count, ...post } = await prisma.post.findUniqueOrThrow({
@@ -316,7 +359,7 @@ export const getPostDetails = async (
     return { ...post, commentsCount: _count.comments }
 }
 
-export const userCanViewPost = (post, userId) => {
+export const userCanViewPost = (post: Post, userId: number) => {
     if (!post.publishedAt) {
         if (!userId || post.authorId !== userId) {
             return false

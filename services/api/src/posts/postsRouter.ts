@@ -27,7 +27,7 @@ import {
 import { checkPermission } from "../middlewares/checkPermission.js"
 import { PermissionType } from "@prisma/client"
 
-const router = Router()
+const router: Router = Router()
 const idRouter = Router({ mergeParams: true })
 
 // /posts/:id/hide
