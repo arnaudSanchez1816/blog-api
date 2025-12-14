@@ -1,5 +1,6 @@
 import type { Prisma } from "@prisma/client"
 import { prisma } from "../config/prisma.js"
+import type { TagIdOrSlug } from "../types/tagIdOrSlug.js"
 
 type UpdateTagDTO = Prisma.TagGetPayload<{
     select: {
@@ -14,8 +15,6 @@ type CreateTagDTO = Prisma.TagGetPayload<{
         slug: true
     }
 }>
-
-type TagIdOrSlug = string | number
 
 export const getTag = async (tagIdOrSlug: TagIdOrSlug) => {
     const isSlug = typeof tagIdOrSlug === "string"
