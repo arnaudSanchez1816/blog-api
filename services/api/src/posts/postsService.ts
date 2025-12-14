@@ -172,7 +172,7 @@ function buildGetPostsQueryOptions(
         },
         omit: {
             body: !includeBody,
-            authorId: false,
+            authorId: true,
         },
         orderBy,
         skip,
