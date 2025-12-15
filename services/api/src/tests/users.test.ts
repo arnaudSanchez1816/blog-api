@@ -10,18 +10,19 @@ import {
     testPermissions,
 } from "./helpers/tests-helpers.js"
 import { SortByValues } from "../posts/postsService.js"
+import type { Prisma } from "@prisma/client"
 
 describe("/users", () => {
     const adminEmail = "admin@email.com"
     const userEmail = "user@email.com"
     const password = "password"
-    let adminUser
-    let regularUser
+    let adminUser: Prisma.UserGetPayload<{ include: { roles: true } }>
+    let regularUser: Prisma.UserGetPayload<{ include: { roles: true } }>
 
     beforeEach(async () => {
         const hashedPassword = bcryptjs.hashSync(
             password,
-            +process.env.PASSWORD_SALT_LENGTH
+            +process.env.PASSWORD_SALT_LENGTH!
         )
         const [admin, regular] = await prisma.$transaction([
             prisma.user.create({

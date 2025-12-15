@@ -14,7 +14,7 @@ describe("/auth", () => {
     beforeEach(async () => {
         const hashedPassword = bcryptjs.hashSync(
             userPassword,
-            +process.env.PASSWORD_SALT_LENGTH
+            +process.env.PASSWORD_SALT_LENGTH!
         )
         await prisma.user.create({
             data: {
@@ -50,7 +50,7 @@ describe("/auth", () => {
             expect(body).toHaveProperty("accessToken")
             const { accessToken } = body
             expect(
-                jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET)
+                jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET!)
             ).not.toBeNull()
         })
 
@@ -68,14 +68,18 @@ describe("/auth", () => {
             expect(refreshTokenCookie).not.toBeNull()
 
             // Parse signed token
-            const { value: signedValue } = refreshTokenCookie
+            const { value: signedValue } = refreshTokenCookie!
             const refreshToken = parseSigned(signedValue)
+            expect(refreshToken).not.toBeUndefined() // parseSigned return undefined if the signed cookie is not valid
             expect(refreshToken).not.toBe(false) // parseSigned return false if the signed cookie is not valid
             expect(
-                jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET)
+                jwt.verify(
+                    refreshToken as string,
+                    process.env.JWT_REFRESH_SECRET!
+                )
             ).not.toBeNull()
 
-            const { HttpOnly, Secure } = refreshTokenCookie.flags
+            const { HttpOnly, Secure } = refreshTokenCookie!.flags
             expect(HttpOnly).toBe(true)
             expect(Secure).toBe(true)
         })
@@ -116,20 +120,20 @@ describe("/auth", () => {
                     name: "username",
                     email: "user@email.com",
                 },
-                process.env.JWT_REFRESH_SECRET
+                process.env.JWT_REFRESH_SECRET!
             )
 
             const { status, body } = await api
                 .get(v1Api("/auth/token"))
                 .set("Cookie", [
-                    `${REFRESH_TOKEN_COOKIE}=s:${sign(refreshToken, process.env.SIGNED_COOKIE_SECRET)}`,
+                    `${REFRESH_TOKEN_COOKIE}=s:${sign(refreshToken, process.env.SIGNED_COOKIE_SECRET!)}`,
                 ])
 
             expect(status).toBe(200)
             expect(body).toHaveProperty("accessToken")
             const { accessToken } = body
             expect(
-                jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET)
+                jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET!)
             ).not.toBeNull()
         })
 
@@ -140,13 +144,13 @@ describe("/auth", () => {
                     name: "otherUser",
                     email: "user2@email.com",
                 },
-                process.env.JWT_REFRESH_SECRET
+                process.env.JWT_REFRESH_SECRET!
             )
 
             const { status } = await api
                 .get(v1Api("/auth/token"))
                 .set("Cookie", [
-                    `${REFRESH_TOKEN_COOKIE}=s:${sign(refreshToken, process.env.SIGNED_COOKIE_SECRET)}`,
+                    `${REFRESH_TOKEN_COOKIE}=s:${sign(refreshToken, process.env.SIGNED_COOKIE_SECRET!)}`,
                 ])
 
             expect(status).toBe(401)
@@ -159,7 +163,7 @@ describe("/auth", () => {
                     name: "username",
                     email: "user@email.com",
                 },
-                process.env.JWT_REFRESH_SECRET,
+                process.env.JWT_REFRESH_SECRET!,
                 {
                     expiresIn: "100ms",
                 }
@@ -171,7 +175,7 @@ describe("/auth", () => {
             const { status } = await api
                 .get(v1Api("/auth/token"))
                 .set("Cookie", [
-                    `${REFRESH_TOKEN_COOKIE}=s:${sign(refreshToken, process.env.SIGNED_COOKIE_SECRET)}`,
+                    `${REFRESH_TOKEN_COOKIE}=s:${sign(refreshToken, process.env.SIGNED_COOKIE_SECRET!)}`,
                 ])
 
             expect(status).toBe(401)
