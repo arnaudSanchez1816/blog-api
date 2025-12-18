@@ -1,6 +1,12 @@
+interface PostCommentParams {
+    postId: number
+    username: string
+    commentBody: string
+}
+
 export const postComment = async (
-    { postId, username, commentBody },
-    accessToken = null
+    { postId, username, commentBody }: PostCommentParams,
+    accessToken?: string
 ) => {
     const API_URL = import.meta.env.VITE_API_URL
 
@@ -23,7 +29,7 @@ export const postComment = async (
     }
 }
 
-export const fetchComments = async (postId, accessToken = null) => {
+export const fetchComments = async (postId: number, accessToken?: string) => {
     if (!postId) {
         throw new Error("PostId is invalid")
     }
@@ -47,7 +53,7 @@ export const fetchComments = async (postId, accessToken = null) => {
     return comments
 }
 
-export const deleteComment = async (commentId, accessToken) => {
+export const deleteComment = async (commentId: number, accessToken: string) => {
     if (!commentId) {
         throw new Error("Comment id is invalid")
     }

@@ -1,4 +1,17 @@
-export const fetchTags = async () => {
+export interface TagDetails {
+    id: number
+    name: string
+    slug: string
+}
+
+export interface FetchTagsResult {
+    metadata: {
+        count: number
+    }
+    results: TagDetails[]
+}
+
+export const fetchTags = async (): Promise<FetchTagsResult> => {
     const apiUrl = import.meta.env.VITE_API_URL
     const url = new URL(`./tags`, apiUrl)
 
@@ -12,7 +25,10 @@ export const fetchTags = async () => {
     return tags
 }
 
-export const deleteTag = async (idOrSlug, accessToken) => {
+export const deleteTag = async (
+    idOrSlug: string | number,
+    accessToken: string
+): Promise<TagDetails> => {
     const apiUrl = import.meta.env.VITE_API_URL
     const url = new URL(`./tags/${idOrSlug}`, apiUrl)
 
@@ -32,7 +48,16 @@ export const deleteTag = async (idOrSlug, accessToken) => {
     return body
 }
 
-export const editTag = async ({ name, slug }, idOrSlug, accessToken) => {
+interface EditTagParams {
+    name: string
+    slug: string
+}
+
+export const editTag = async (
+    { name, slug }: EditTagParams,
+    idOrSlug: string | number,
+    accessToken: string
+): Promise<TagDetails> => {
     const apiUrl = import.meta.env.VITE_API_URL
     const url = new URL(`./tags/${idOrSlug}`, apiUrl)
 
@@ -53,7 +78,15 @@ export const editTag = async ({ name, slug }, idOrSlug, accessToken) => {
     return updatedTag
 }
 
-export const createTag = async ({ name, slug }, accessToken) => {
+interface CreateTagParams extends Pick<EditTagParams, "name" | "slug"> {
+    name: string
+    slug: string
+}
+
+export const createTag = async (
+    { name, slug }: CreateTagParams,
+    accessToken: string
+): Promise<TagDetails> => {
     const apiUrl = import.meta.env.VITE_API_URL
     const url = new URL(`./tags`, apiUrl)
 

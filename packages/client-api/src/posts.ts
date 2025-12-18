@@ -1,13 +1,64 @@
+export interface PostDetails {
+    id: number
+    title: string
+    description: string
+    body: string
+    readingTime: number
+    publishedAt: Date | null
+    commentsCount: number
+    author: {
+        name: string
+        id: number
+    }
+    tags: {
+        name: string
+        id: number
+        slug: string
+    }[]
+}
+
+export type PostDetailsWithoutCommentsAndTags = Omit<
+    PostDetails,
+    "tags" | "commentsCount"
+>
+
+export interface FetchPostsParams {
+    q?: string
+    page?: number
+    pageSize?: number
+    sortBy?: "publishedAt" | "-publishedAt" | "id" | "-id"
+    showUnpublished?: boolean
+    tags: string | string[]
+}
+
+export interface FetchPostsResult {
+    metadata: {
+        count: number
+        page: number | undefined
+        pageSize: number | undefined
+        sortBy: "id" | "publishedAt" | "-publishedAt" | "-id" | undefined
+        tags: (string | number)[] | undefined
+    }
+    results: Omit<PostDetails, "body">[]
+}
+
 export const fetchPosts = async (
-    { q, tags, page, pageSize, sortBy, showUnpublished = false },
-    token
-) => {
+    {
+        q,
+        tags,
+        page,
+        pageSize,
+        sortBy,
+        showUnpublished = false,
+    }: FetchPostsParams,
+    token?: string
+): Promise<FetchPostsResult> => {
     const searchParams = new URLSearchParams()
     if (page) {
-        searchParams.set("page", page)
+        searchParams.set("page", page.toString())
     }
     if (pageSize) {
-        searchParams.set("pageSize", pageSize)
+        searchParams.set("pageSize", pageSize.toString())
     }
     if (q) {
         searchParams.set("q", q)
@@ -52,7 +103,10 @@ export const fetchPosts = async (
     }
 }
 
-export const fetchPost = async (postId, accessToken = null) => {
+export const fetchPost = async (
+    postId: number,
+    accessToken?: string
+): Promise<PostDetails> => {
     const apiUrl = import.meta.env.VITE_API_URL
     const url = new URL(`./posts/${postId}`, apiUrl)
     const response = await fetch(url, {
@@ -72,7 +126,10 @@ export const fetchPost = async (postId, accessToken = null) => {
     return post
 }
 
-export const deletePost = async (postId, accessToken) => {
+export const deletePost = async (
+    postId: number,
+    accessToken: string
+): Promise<PostDetailsWithoutCommentsAndTags> => {
     const apiUrl = import.meta.env.VITE_API_URL
     const url = new URL(`./posts/${postId}`, apiUrl)
 
@@ -94,7 +151,10 @@ export const deletePost = async (postId, accessToken) => {
     return post
 }
 
-export const publishPost = async (postId, accessToken) => {
+export const publishPost = async (
+    postId: number,
+    accessToken: string
+): Promise<void> => {
     const apiUrl = import.meta.env.VITE_API_URL
     const url = new URL(`./posts/${postId}/publish`, apiUrl)
 
@@ -112,7 +172,10 @@ export const publishPost = async (postId, accessToken) => {
     }
 }
 
-export const hidePost = async (postId, accessToken) => {
+export const hidePost = async (
+    postId: number,
+    accessToken: string
+): Promise<void> => {
     const apiUrl = import.meta.env.VITE_API_URL
     const url = new URL(`./posts/${postId}/hide`, apiUrl)
 
@@ -130,11 +193,17 @@ export const hidePost = async (postId, accessToken) => {
     }
 }
 
+interface UpdatePostParams {
+    body: string
+    title: string
+    tags: number[]
+}
+
 export const updatePost = async (
-    postId,
-    { body, title, tags },
-    accessToken
-) => {
+    postId: number,
+    { body, title, tags }: UpdatePostParams,
+    accessToken: string
+): Promise<Omit<PostDetails, "commentsCount">> => {
     const apiUrl = import.meta.env.VITE_API_URL
     const url = new URL(`./posts/${postId}`, apiUrl)
     const response = await fetch(url, {
