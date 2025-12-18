@@ -12,14 +12,14 @@ import type { ReactNode } from "react"
 export interface AuthContextProps {
     user?: UserDetails | null | undefined
     accessToken?: string | null | undefined
-    login?: ({ email, password }: LoginParams) => Promise<{
+    login: ({ email, password }: LoginParams) => Promise<{
         user?: UserDetails
         error?: string
     }>
-    logout?: () => void
+    logout: () => void
 }
 
-export const AuthContext = createContext<AuthContextProps>({})
+export const AuthContext = createContext<AuthContextProps | null>(null)
 
 export interface LoginParams {
     email: string
@@ -31,7 +31,7 @@ export const AuthProvider = ({
     loaderComponent,
 }: {
     children: ReactNode
-    loaderComponent: ReactNode
+    loaderComponent: React.ReactElement
 }) => {
     const [user, setUser] = useState<UserDetails | undefined | null>(undefined)
     const [accessToken, setAccessToken] = useState<string | undefined | null>(
