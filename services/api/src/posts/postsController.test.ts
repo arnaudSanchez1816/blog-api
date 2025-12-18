@@ -333,15 +333,17 @@ describe("postsController", () => {
 
             request.user = { id: 1 }
 
-            vi.mocked(PostsService.createPost).mockResolvedValueOnce({
-                id: 1,
-                body: "body",
-                title: "title",
-                authorId: 1,
-                description: "desc",
-                publishedAt: null,
-                readingTime: 1,
-            })
+            vi.mocked(PostsService.createPost).mockResolvedValueOnce(
+                generatePostDetails({
+                    id: 1,
+                    body: "body",
+                    title: "title",
+                    authorId: 1,
+                    description: "desc",
+                    publishedAt: null,
+                    readingTime: 1,
+                })
+            )
 
             await PostsController.createPost(request, response, next)
             expect(PostsService.createPost).toHaveBeenCalledWith(
@@ -375,14 +377,14 @@ describe("postsController", () => {
                 })
             )
 
-            const expectedPost = {
+            const expectedPost = generatePostDetails({
                 id: 10,
                 body: "body",
                 title: "title",
                 description: "desc",
                 readingTime: 1,
                 tags: [],
-            }
+            })
             vi.mocked(PostsService.updatePost).mockResolvedValueOnce(
                 expectedPost
             )
@@ -417,14 +419,16 @@ describe("postsController", () => {
                 })
             )
 
-            vi.mocked(PostsService.updatePost).mockResolvedValueOnce({
-                id: 10,
-                body: "body",
-                title: "title",
-                description: "desc",
-                readingTime: 1,
-                tags: [],
-            })
+            vi.mocked(PostsService.updatePost).mockResolvedValueOnce(
+                generatePostDetails({
+                    id: 10,
+                    body: "body",
+                    title: "title",
+                    description: "desc",
+                    readingTime: 1,
+                    tags: [],
+                })
+            )
 
             await PostsController.updatePost(request, response, next)
             expect(PostsService.updatePost).toHaveBeenCalledWith({
@@ -556,7 +560,8 @@ describe("postsController", () => {
 
             await PostsController.deletePost(request, response, next)
             expect(PostsService.getPostDetails).toHaveBeenCalledWith(
-                request.params.id
+                request.params.id,
+                { includeComments: true, includeTags: true }
             )
             expect(PostsService.deletePost).toHaveBeenCalledWith(
                 request.params.id

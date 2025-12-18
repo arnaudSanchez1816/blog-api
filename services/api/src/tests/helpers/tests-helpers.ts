@@ -103,15 +103,26 @@ export const createPosts = async (
     }))
 }
 
+interface GeneratePostDetailsParams
+    extends Partial<
+        Prisma.PostGetPayload<{
+            include: {
+                author: true
+                tags: true
+                comments: true
+            }
+        }>
+    > {
+    commentsCount?: number
+}
+
 export const generatePostDetails = (
-    data: Partial<PostDetails>
+    data: GeneratePostDetailsParams
 ): PostDetails => {
     return {
         id: data.id ?? 1,
-        authorId: data.authorId ?? 1,
         author: data.author ?? {
-            id: 1,
-            email: "user@email.com",
+            id: data.authorId ?? 1,
             name: "username",
         },
         body: data.body ?? "content",

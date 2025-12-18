@@ -4,7 +4,6 @@ import DOMPurify from "dompurify"
 import { marked, Renderer } from "marked"
 import { plainTextRenderer } from "../helpers/markedPlainTextRenderer.js"
 import type { TagIdOrSlug } from "../types/tagIdOrSlug.js"
-import type { Post } from "@prisma/client"
 import { Prisma } from "@prisma/client"
 import type { Optional } from "../types/optional.js"
 
@@ -16,6 +15,30 @@ export const SortByValues = {
 } as const
 
 type SortByValues = (typeof SortByValues)[keyof typeof SortByValues]
+
+export interface PostDetails
+    extends Prisma.PostGetPayload<{
+        include: {
+            comments: true
+            tags: true
+            author: {
+                select: {
+                    id: true
+                    name: true
+                }
+            }
+        }
+        omit: {
+            authorId: true
+        }
+    }> {
+    commentsCount: number
+}
+
+type PostDetailsWithoutCommentsAndTags = Omit<
+    PostDetails,
+    "tags" | "comments" | "commentsCount"
+>
 
 // Also can works like this if SortByValues is not const
 // type SortByValuesType = Readonly<typeof SortByValues>
@@ -32,7 +55,21 @@ interface GetPostsOptions {
     includeBody?: boolean
 }
 
-export const getPosts = async ({
+interface GetPostsResult {
+    posts: Omit<PostDetails, "comments">[]
+    count: number
+}
+
+interface GetPostsResultWithoutBody extends Omit<GetPostsResult, "posts"> {
+    posts: Omit<PostDetails, "comments" | "body">[]
+}
+
+export function getPosts(
+    options: GetPostsOptions & { includeBody: false }
+): Promise<GetPostsResultWithoutBody>
+export function getPosts(options?: GetPostsOptions): Promise<GetPostsResult>
+
+export async function getPosts({
     q,
     sortBy = SortByValues.publishedAtDesc,
     page = 1,
@@ -41,7 +78,7 @@ export const getPosts = async ({
     authorId = undefined,
     tags = [],
     includeBody = true,
-}: GetPostsOptions = {}) => {
+}: GetPostsOptions = {}): Promise<GetPostsResult> {
     const whereQuery = buildGetPostsQuery(q, publishedOnly, authorId, tags)
     const queryOptions = buildGetPostsQueryOptions(
         whereQuery,
@@ -182,12 +219,26 @@ function buildGetPostsQueryOptions(
     return queryOptions
 }
 
-export const createPost = async (title: string, authorId: number) => {
+export const createPost = async (
+    title: string,
+    authorId: number
+): Promise<PostDetailsWithoutCommentsAndTags> => {
     const createdPost = await prisma.post.create({
         data: {
             title: title,
             body: `New blog post`,
             authorId: authorId,
+        },
+        include: {
+            author: {
+                select: {
+                    id: true,
+                    name: true,
+                },
+            },
+        },
+        omit: {
+            authorId: true,
         },
     })
 
@@ -208,7 +259,12 @@ interface UpdatePostDto
     tags?: TagIdOrSlug[]
 }
 
-export const updatePost = async ({ id, title, body, tags }: UpdatePostDto) => {
+export const updatePost = async ({
+    id,
+    title,
+    body,
+    tags,
+}: UpdatePostDto): Promise<Omit<PostDetails, "comments" | "commentsCount">> => {
     if (!id) {
         throw new Error("Invalid post id")
     }
@@ -217,23 +273,12 @@ export const updatePost = async ({ id, title, body, tags }: UpdatePostDto) => {
         ...(title && { title }),
         ...(body && { body }),
     }
-    const querySelect: Pick<
-        Prisma.PostSelect,
-        "id" | "title" | "body" | "description" | "readingTime" | "tags"
-    > = {
-        id: true,
-        title: !!title,
-        body: !!body,
-    }
 
     if (body) {
         const { description, readingTime } = parseBody(body)
 
         queryUpdateData.description = description
         queryUpdateData.readingTime = readingTime
-
-        querySelect.description = true
-        querySelect.readingTime = true
     }
 
     if (tags && tags.length > 0) {
@@ -249,7 +294,6 @@ export const updatePost = async ({ id, title, body, tags }: UpdatePostDto) => {
                 }
             }),
         }
-        querySelect.tags = true
     }
 
     const updatedPost = await prisma.post.update({
@@ -257,7 +301,18 @@ export const updatePost = async ({ id, title, body, tags }: UpdatePostDto) => {
             id,
         },
         data: queryUpdateData,
-        select: querySelect,
+        include: {
+            author: {
+                select: {
+                    id: true,
+                    name: true,
+                },
+            },
+            tags: true,
+        },
+        omit: {
+            authorId: true,
+        },
     })
 
     return updatedPost
@@ -293,17 +348,32 @@ function parseBody(body: string) {
     return { description, readingTime }
 }
 
-export const deletePost = async (postId: number) => {
+export const deletePost = async (
+    postId: number
+): Promise<PostDetailsWithoutCommentsAndTags> => {
     const deletedPost = await prisma.post.delete({
         where: {
             id: postId,
+        },
+        include: {
+            author: {
+                select: {
+                    id: true,
+                    name: true,
+                },
+            },
+        },
+        omit: {
+            authorId: true,
         },
     })
 
     return deletedPost
 }
 
-export const publishPost = async (postId: number) => {
+export const publishPost = async (
+    postId: number
+): Promise<PostDetailsWithoutCommentsAndTags> => {
     const publishedPost = await prisma.post.update({
         where: {
             id: postId,
@@ -311,12 +381,25 @@ export const publishPost = async (postId: number) => {
         data: {
             publishedAt: new Date(),
         },
+        include: {
+            author: {
+                select: {
+                    id: true,
+                    name: true,
+                },
+            },
+        },
+        omit: {
+            authorId: true,
+        },
     })
 
     return publishedPost
 }
 
-export const hidePost = async (postId: number) => {
+export const hidePost = async (
+    postId: number
+): Promise<PostDetailsWithoutCommentsAndTags> => {
     const publishedPost = await prisma.post.update({
         where: {
             id: postId,
@@ -324,32 +407,48 @@ export const hidePost = async (postId: number) => {
         data: {
             publishedAt: null,
         },
+        include: {
+            author: {
+                select: {
+                    id: true,
+                    name: true,
+                },
+            },
+        },
+        omit: {
+            authorId: true,
+        },
     })
 
     return publishedPost
 }
 
-export interface PostDetails
-    extends Prisma.PostGetPayload<{
-        include: {
-            comments: true
-            tags: true
-            author: {
-                select: {
-                    id: true
-                    email: true
-                    name: true
-                }
-            }
-        }
-    }> {
-    commentsCount: number
-}
+export async function getPostDetails(
+    postId: number,
+    getPostOptions: { includeComments: true }
+): Promise<Omit<PostDetails, "tags"> | null>
 
-export const getPostDetails = async (
+export async function getPostDetails(
+    postId: number,
+    getPostOptions: { includeTags: true }
+): Promise<Omit<PostDetails, "comments"> | null>
+
+export async function getPostDetails(
+    postId: number,
+    getPostOptions: {
+        includeTags: true
+        includeComments: true
+    }
+): Promise<PostDetails | null>
+
+export async function getPostDetails(
+    postId: number
+): Promise<Omit<PostDetails, "comments" | "tags"> | null>
+
+export async function getPostDetails(
     postId: number,
     { includeComments = false, includeTags = false } = {}
-): Promise<PostDetails | null> => {
+) {
     const postResult = await prisma.post.findUnique({
         where: {
             id: postId,
@@ -358,7 +457,6 @@ export const getPostDetails = async (
             author: {
                 select: {
                     id: true,
-                    email: true,
                     name: true,
                 },
             },
@@ -374,6 +472,9 @@ export const getPostDetails = async (
                 tags: true,
             }),
         },
+        omit: {
+            authorId: true,
+        },
     })
 
     if (!postResult) {
@@ -385,12 +486,43 @@ export const getPostDetails = async (
     return { ...post, commentsCount: _count.comments }
 }
 
-export const userCanViewPost = (post: Post, userId: number) => {
+type PostWithAuthorId = {
+    publishedAt: Date | null
+    authorId: number
+}
+
+type PostWithAuthor = {
+    publishedAt: Date | null
+    author: {
+        id: number
+    }
+}
+
+export function userCanViewPost<T extends PostWithAuthorId>(
+    post: T,
+    userId: number
+): boolean
+export function userCanViewPost<T extends PostWithAuthor>(
+    post: T,
+    userId: number
+): boolean
+export function userCanViewPost(
+    post: PostWithAuthorId | PostWithAuthor,
+    userId: number
+) {
+    const authorId = isPostWithAuthorId(post) ? post.authorId : post.author.id
+
     if (!post.publishedAt) {
-        if (!userId || post.authorId !== userId) {
+        if (!userId || authorId !== userId) {
             return false
         }
     }
 
     return true
+}
+
+function isPostWithAuthorId(
+    post: PostWithAuthorId | PostWithAuthor
+): post is PostWithAuthorId {
+    return (post as PostWithAuthorId).authorId !== undefined
 }

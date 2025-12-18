@@ -123,7 +123,7 @@ export const updatePost = async (
             throw new createHttpError.NotFound()
         }
 
-        if (post.authorId !== userId) {
+        if (post.author.id !== userId) {
             throw new createHttpError.Forbidden()
         }
 
@@ -154,12 +154,15 @@ export const deletePost = async (
         const { id: postId } = req.params
         const { id: userId } = user
 
-        const post = await postsService.getPostDetails(postId)
+        const post = await postsService.getPostDetails(postId, {
+            includeComments: true,
+            includeTags: true,
+        })
         if (!post) {
             throw new createHttpError.NotFound()
         }
 
-        if (post.authorId !== userId) {
+        if (post.author.id !== userId) {
             throw new createHttpError.Forbidden()
         }
 
@@ -190,7 +193,7 @@ export const publishPost = async (
         if (!post) {
             throw new createHttpError.NotFound()
         }
-        if (post.authorId !== userId) {
+        if (post.author.id !== userId) {
             throw new createHttpError.Forbidden()
         }
         if (post.publishedAt) {
@@ -224,7 +227,7 @@ export const hidePost = async (
         if (!post) {
             throw new createHttpError.NotFound()
         }
-        if (post.authorId !== userId) {
+        if (post.author.id !== userId) {
             throw new createHttpError.Forbidden()
         }
         if (!post.publishedAt) {
