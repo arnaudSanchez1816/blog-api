@@ -23,12 +23,12 @@ export type PostDetailsWithoutCommentsAndTags = Omit<
 >
 
 export interface FetchPostsParams {
-    q?: string
-    page?: number
-    pageSize?: number
-    sortBy?: "publishedAt" | "-publishedAt" | "id" | "-id"
-    showUnpublished?: boolean
-    tags: string | string[]
+    q?: string | null
+    page?: number | null
+    pageSize?: number | null
+    sortBy?: "publishedAt" | "-publishedAt" | "id" | "-id" | null
+    showUnpublished?: boolean | null
+    tags: string | string[] | null
 }
 
 export interface FetchPostsResult {
@@ -105,7 +105,7 @@ export const fetchPosts = async (
 
 export const fetchPost = async (
     postId: number,
-    accessToken?: string
+    accessToken?: string | null
 ): Promise<PostDetails> => {
     const apiUrl = import.meta.env.VITE_API_URL
     const url = new URL(`./posts/${postId}`, apiUrl)
