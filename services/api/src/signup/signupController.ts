@@ -3,6 +3,7 @@ import * as signupService from "./signupService.js"
 import { validateRequest } from "../middlewares/validator.js"
 import type { Request, Response, NextFunction } from "express"
 import z from "zod"
+import { GetUserPersonnalDetails } from "@/users/usersService.js"
 
 type SignupSchema = z.infer<typeof signupValidator>
 export const signup = [
@@ -21,9 +22,7 @@ export const signup = [
                 password,
             })
 
-            const { password: userPassword, ...userDetails } = newUser
-
-            return res.status(201).json(userDetails)
+            return res.status(201).json(newUser)
         } catch (error) {
             next(error)
         }
