@@ -26,9 +26,9 @@ export interface FetchPostsParams {
     q?: string | null
     page?: number | null
     pageSize?: number | null
-    sortBy?: "publishedAt" | "-publishedAt" | "id" | "-id" | null
+    sortBy?: "publishedAt" | "-publishedAt" | "id" | "-id" | string | null
     showUnpublished?: boolean | null
-    tags: string | string[] | null
+    tags?: string | string[] | null
 }
 
 export interface FetchPostsResult {
