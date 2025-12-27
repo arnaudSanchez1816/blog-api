@@ -2,7 +2,11 @@ import { useLoaderData } from "react-router"
 import aboutMarkdownUrl from "../assets/about.md"
 import PostMarkdown from "@repo/ui/components/posts/PostMarkdown"
 
-export const aboutLoader = async () => {
+export interface AboutLoaderReturnValue {
+    aboutMd: string
+}
+
+export const aboutLoader = async (): Promise<AboutLoaderReturnValue> => {
     const response = await fetch(aboutMarkdownUrl)
     if (!response.ok) {
         throw response
@@ -14,7 +18,7 @@ export const aboutLoader = async () => {
 }
 
 export default function About() {
-    const { aboutMd } = useLoaderData()
+    const { aboutMd } = useLoaderData<AboutLoaderReturnValue>()
 
     return (
         <div className="mx-auto pt-6">

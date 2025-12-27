@@ -14,8 +14,21 @@ import ThemeSwitcher from "@repo/ui/components/ThemeSwitcher"
 import NavLink from "@repo/ui/components/NavLink"
 import BlogLogo from "@repo/ui/components/Icons/BlogLogo"
 
-export default function Header({ title = "Blog-API", navItems = [] }) {
-    const rootRef = useRef(null)
+export interface HeaderNavItem {
+    name: string
+    href: string
+}
+
+export interface HeaderProps {
+    title?: string
+    navItems?: HeaderNavItem[]
+}
+
+export default function Header({
+    title = "Blog-API",
+    navItems = [],
+}: HeaderProps) {
+    const rootRef = useRef<Element | null>(null)
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const location = useLocation()
     const locationPathname = location.pathname
@@ -91,7 +104,7 @@ export default function Header({ title = "Blog-API", navItems = [] }) {
             <NavbarContent justify="end">
                 <ThemeSwitcher />
             </NavbarContent>
-            <NavbarMenu portalContainer={rootRef.current}>
+            <NavbarMenu portalContainer={rootRef.current ?? undefined}>
                 {navItems.map((item) => (
                     <NavbarMenuItem key={item.href}>
                         <NavLink

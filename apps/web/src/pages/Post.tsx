@@ -1,14 +1,23 @@
-import { data, useLoaderData, useLocation } from "react-router"
+import {
+    data,
+    LoaderFunctionArgs,
+    useLoaderData,
+    useLocation,
+} from "react-router"
 import { Divider } from "@heroui/react"
 import { postSchema } from "@repo/zod-schemas"
 import CommentsSection, {
     commentsSectionId,
 } from "@repo/ui/components/CommentsSection/CommentsSection"
-import { fetchPost } from "@repo/client-api/posts"
+import { fetchPost, PostDetails } from "@repo/client-api/posts"
 import PostHeader from "@repo/ui/components/posts/PostHeader"
 import PostMarkdown from "@repo/ui/components/posts/PostMarkdown"
 
-export const postPageLoader = async ({ params }) => {
+type PostPageLoaderReturnValue = PostDetails
+
+export const postPageLoader = async ({
+    params,
+}: LoaderFunctionArgs): Promise<PostPageLoaderReturnValue> => {
     try {
         const postIdSchema = postSchema.pick({ id: true })
         const { id } = await postIdSchema.parseAsync({ id: params.postId })
@@ -22,7 +31,11 @@ export const postPageLoader = async ({ params }) => {
     }
 }
 
-function Post({ post }) {
+export interface PostPageProps {
+    post: PostDetails
+}
+
+function Post({ post }: PostPageProps) {
     const { id, body, commentsCount } = post
 
     let commentsAutoFetched = false
@@ -52,7 +65,7 @@ function Post({ post }) {
 }
 
 export default function PostPage() {
-    const post = useLoaderData()
+    const post = useLoaderData<PostPageLoaderReturnValue>()
 
     return <Post key={post.id} post={post} />
 }

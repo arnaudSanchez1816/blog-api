@@ -2,11 +2,15 @@ import { Await, useLoaderData } from "react-router"
 import { Suspense } from "react"
 import PostsListSkeleton from "@repo/ui/components/PostsList/PostsListSkeleton"
 import PostsList from "@repo/ui/components/PostsList/PostsList"
-import { fetchPosts } from "@repo/client-api/posts"
+import { fetchPosts, FetchPostsResult } from "@repo/client-api/posts"
 
 const pageSize = 5
 
-export async function homeLoader() {
+interface HomeLoaderReturnValue {
+    getPosts: Promise<FetchPostsResult>
+}
+
+export async function homeLoader(): Promise<HomeLoaderReturnValue> {
     const getPosts = fetchPosts({
         page: 1,
         pageSize,
@@ -16,7 +20,7 @@ export async function homeLoader() {
 }
 
 export default function Home() {
-    const { getPosts } = useLoaderData()
+    const { getPosts } = useLoaderData<HomeLoaderReturnValue>()
 
     return (
         <>
