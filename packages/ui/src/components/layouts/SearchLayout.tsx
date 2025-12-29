@@ -36,7 +36,7 @@ export const useSearchLayoutContext = () => {
 
 export default function SearchLayout() {
     const { results: tags } = useLoaderData<FetchTagsResult>()
-    const searchInputRef = useRef(null)
+    const searchInputRef = useRef<HTMLInputElement>(null)
     const location = useLocation()
     const [searchParams] = useSearchParams()
     const q = searchParams.get("q") || ""
@@ -44,11 +44,10 @@ export default function SearchLayout() {
 
     const matches = useMatches() as UIMatch<unknown, SearchLayoutHandleType>[]
     const titleHandles = matches.filter((match) => Boolean(match.handle?.title))
-    let title = titleHandles[0]?.handle?.title
+    const title = titleHandles[0]?.handle?.title
 
     useEffect(() => {
         if (searchInputRef.current) {
-            // @ts-expect-error
             searchInputRef.current.value = q
         }
     }, [q])

@@ -21,6 +21,7 @@ export default function CommentReplyForm({
         user = authContext.user
     } catch (error) {
         /* empty */
+        console.error(error)
     }
     const [submitting, setSubmitting] = useState(false)
 

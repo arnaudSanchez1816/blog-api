@@ -16,7 +16,7 @@ export const searchLoader = async ({ request }: LoaderFunctionArgs) => {
     const q = url.searchParams.get("q")
     const tagTerm = url.searchParams.get("tag")
     const pageTerm = url.searchParams.get("page")
-    const sortBy = url.searchParams.get("sortBy") as any
+    const sortBy = url.searchParams.get("sortBy")
 
     const posts = await fetchPosts({
         q: q,
@@ -35,7 +35,7 @@ export default function Search() {
     const [currentPageString, setCurrentPage] = useParamSearchParams("page", 1)
     const isMd = useTwBreakpoint("md")
     const { count } = metadata
-    const [leftContent, setLeftContent] = useSearchLayoutContext()
+    const [, setLeftContent] = useSearchLayoutContext()
 
     const currentPage = Number(currentPageString)
 

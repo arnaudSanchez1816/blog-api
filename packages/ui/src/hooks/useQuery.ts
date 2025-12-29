@@ -10,9 +10,14 @@ export default function useQuery<T>({
     queryFn,
     queryKey,
     enabled = true,
-}: UseQueryProps<T>): [T | undefined, boolean, any | undefined, () => void] {
+}: UseQueryProps<T>): [
+    T | undefined,
+    boolean,
+    unknown | undefined,
+    () => void,
+] {
     const [data, setData] = useState<T | undefined>(undefined)
-    const [error, setError] = useState<any | undefined>(undefined)
+    const [error, setError] = useState<unknown | undefined>(undefined)
     const [fetchData, setFetchData] = useState(enabled)
     const [loading, setLoading] = useState(fetchData)
     useEffect(() => {

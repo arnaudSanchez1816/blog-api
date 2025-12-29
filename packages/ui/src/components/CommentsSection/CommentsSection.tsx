@@ -58,6 +58,7 @@ export default function CommentsSection({
         accessToken = authContext.accessToken
     } catch (error) {
         /* empty */
+        console.error(error)
     }
 
     const fetchCommentsQuery = useCallback(() => {
