@@ -4,8 +4,8 @@
     "type": "module",
     "private": true,
     "exports": {
-        "./useAuth": "./src/useAuth.js",
-        "./AuthProvider": "./src/AuthProvider.jsx"
+        "./useAuth": "./src/useAuth.ts",
+        "./AuthProvider": "./src/AuthProvider.tsx"
     },
     "scripts": {
         "lint": "eslint . --max-warnings 0"
