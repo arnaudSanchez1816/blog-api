@@ -33,10 +33,9 @@ export const AuthProvider = ({
     children: ReactNode
     loaderComponent: React.ReactElement
 }) => {
-    const [user, setUser] = useState<UserDetails | null | undefined>(null)
-    const [accessToken, setAccessToken] = useState<string | null | undefined>(
-        null
-    )
+    const [user, setUser] = useState<UserDetails | null>(null)
+    const [accessToken, setAccessToken] = useState<string | null>(null)
+    const [init, setInit] = useState(false)
 
     useLayoutEffect(() => {
         let ignore = false
@@ -62,6 +61,8 @@ export const AuthProvider = ({
                 }
                 setAccessToken(null)
                 setUser(null)
+            } finally {
+                setInit(true)
             }
         }
         initAuthProvider()
@@ -115,7 +116,7 @@ export const AuthProvider = ({
                 if (error instanceof Response) {
                     console.error(error)
                     const body = error.body ? await error.json() : {}
-                    const { errorMessage, details } = body.error || {
+                    const { errorMessage } = body.error || {
                         errorMessage: "Failed to login",
                     }
 
@@ -132,13 +133,13 @@ export const AuthProvider = ({
         setAccessToken(null)
     }, [])
 
-    if (user === undefined || accessToken === undefined) {
-        return loaderComponent || <div>Loading</div>
-    }
-
     const providerValue = useMemo(() => {
         return { user, accessToken, login, logout }
     }, [user, accessToken, login, logout])
+
+    if (init === false) {
+        return loaderComponent || <div>Loading</div>
+    }
 
     return (
         <AuthContext.Provider value={providerValue}>
