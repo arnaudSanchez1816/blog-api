@@ -1,6 +1,6 @@
 {
     "extends": "@repo/typescript-config/react",
-    "include": ["./src", "eslint.config.js", "./vite.config.ts"],
+    "include": ["./src", "./vite.config.ts"],
     "exclude": ["node_modules"],
     "compilerOptions": {
         "lib": ["ES2023", "DOM", "DOM.Iterable"],
