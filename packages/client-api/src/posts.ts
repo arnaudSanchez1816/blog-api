@@ -95,7 +95,7 @@ export const fetchPosts = async (
     if (!response.ok) {
         throw response
     }
-    let { results, ...dataJson } = await response.json()
+    const { results, ...dataJson } = await response.json()
 
     return {
         ...dataJson,
