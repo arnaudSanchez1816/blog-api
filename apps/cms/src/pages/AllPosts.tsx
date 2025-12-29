@@ -1,4 +1,4 @@
-import { useOutletContext, useSearchParams } from "react-router"
+import { useSearchParams } from "react-router"
 import useQuery from "@repo/ui/hooks/useQuery"
 import PostsListSkeleton from "@repo/ui/components/PostsList/PostsListSkeleton"
 import PostsList from "@repo/ui/components/PostsList/PostsList"
@@ -11,12 +11,21 @@ import NewArticleModal from "../components/modals/NewArticleModal"
 import SearchParamsSelect from "@repo/ui/components/Search/SearchParamsSelect"
 import SearchParamsToggle from "@repo/ui/components/Search/SearchParamsToggle"
 import useParamSearchParams from "@repo/ui/hooks/useParamSearchParams"
+import { useSearchLayoutContext } from "../../../../packages/ui/src/components/layouts/SearchLayout"
 
 const DEFAULT_PAGE_SIZE = 10
 
-async function allPostsQuery({ accessToken, searchParams }) {
-    const page = searchParams.get("page")
-    const pageSize = searchParams.get("pageSize") || DEFAULT_PAGE_SIZE
+interface AllPostsQueryParams {
+    accessToken: string
+    searchParams: URLSearchParams
+}
+
+async function allPostsQuery({
+    accessToken,
+    searchParams,
+}: AllPostsQueryParams) {
+    const page = Number(searchParams.get("page"))
+    const pageSize = Number(searchParams.get("pageSize")) || DEFAULT_PAGE_SIZE
     const sortBy = searchParams.get("sortBy")
     const showUnpublished = searchParams.get("unpublished") === "true"
 
@@ -57,11 +66,13 @@ function NewPostButton() {
 
 export default function AllPosts() {
     const { accessToken } = useAuth()
-    const [searchParams, setSearchParams] = useSearchParams()
-    const queryFn = useCallback(
-        () => allPostsQuery({ accessToken, searchParams }),
-        [accessToken, searchParams]
-    )
+    const [searchParams] = useSearchParams()
+    const queryFn = useCallback(() => {
+        if (!accessToken) {
+            throw new Error("Invalid access token")
+        }
+        return allPostsQuery({ accessToken, searchParams })
+    }, [accessToken, searchParams])
     const [allPostsData, isLoading, errors] = useQuery({
         queryKey: ["posts"],
         queryFn,
@@ -69,7 +80,7 @@ export default function AllPosts() {
     const [currentPageString, setCurrentPage] = useParamSearchParams("page", 1)
     const currentPage = Number(currentPageString)
 
-    const [leftContent, setLeftContent] = useOutletContext()
+    const [, setLeftContent] = useSearchLayoutContext()
     useEffect(() => {
         setLeftContent(
             <>
@@ -123,7 +134,8 @@ export default function AllPosts() {
             pagination={{
                 currentPage,
                 setCurrentPage,
-                ...metadata,
+                count: metadata.count,
+                pageSize: metadata.pageSize || DEFAULT_PAGE_SIZE,
             }}
         />
     )

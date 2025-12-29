@@ -1,17 +1,21 @@
 import { Divider } from "@heroui/react"
-import { fetchPost } from "@repo/client-api/posts"
+import { fetchPost, PostDetails } from "@repo/client-api/posts"
 import CommentsSection, {
     commentsSectionId,
 } from "@repo/ui/components/CommentsSection/CommentsSection"
 import { postSchema } from "@repo/zod-schemas"
 import { useEffect } from "react"
-import { useLoaderData, useLocation, useOutletContext } from "react-router"
+import { LoaderFunctionArgs, useLoaderData, useLocation } from "react-router"
 import PostAdminControls from "../components/PostAdminControls/PostAdminControls"
 import CommentWithControls from "../components/CommentWithControls"
 import PostHeader from "@repo/ui/components/posts/PostHeader"
 import PostMarkdown from "@repo/ui/components/posts/PostMarkdown"
+import { useSearchLayoutContext } from "../../../../packages/ui/src/components/layouts/SearchLayout"
 
-export async function postLoader({ params }, accessToken) {
+export async function postLoader(
+    { params }: LoaderFunctionArgs,
+    accessToken: string
+): Promise<PostDetails> {
     const postIdSchema = postSchema.pick({ id: true })
     const { id } = await postIdSchema.parseAsync({ id: params.postId })
     const post = await fetchPost(id, accessToken)
@@ -20,11 +24,11 @@ export async function postLoader({ params }, accessToken) {
 }
 
 export default function Post() {
-    const post = useLoaderData()
+    const post = useLoaderData<PostDetails>()
 
     const { id, body, commentsCount } = post
 
-    const [leftContent, setLeftContent] = useOutletContext()
+    const [, setLeftContent] = useSearchLayoutContext()
     useEffect(() => {
         setLeftContent(<PostAdminControls post={post} />)
         return () => setLeftContent(undefined)

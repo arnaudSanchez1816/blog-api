@@ -8,35 +8,37 @@ import {
     ModalFooter,
     ModalHeader,
 } from "@heroui/react"
-import { useId, useRef, useState } from "react"
+import { FormEvent, useId, useRef, useState } from "react"
 import { z } from "zod"
 import { tagSchema } from "@repo/zod-schemas"
 import { useFetcher } from "react-router"
 
-export default function EditTagModal({ tag, isOpen, setOpen }) {
+export interface NewTagModalProps {
+    isOpen: boolean
+    setOpen: (isOpen: boolean) => void
+}
+
+export default function NewTagModal({ isOpen, setOpen }: NewTagModalProps) {
     const formId = useId()
-    const [errors, setErrors] = useState(null)
-    const formRef = useRef(null)
+    const [errors, setErrors] = useState<Record<string, string | string[]>>({})
+    const formRef = useRef<HTMLFormElement>(null)
     const fetcher = useFetcher()
     const isLoading = fetcher.state !== "idle"
-    const [name, setName] = useState(tag.name)
-    const [slug, setSlug] = useState(tag.slug)
-    const { id } = tag
 
-    const onSubmit = async (e) => {
+    const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         const form = e.currentTarget
 
         const formDataObj = Object.fromEntries(new FormData(form))
 
         try {
-            setErrors(null)
+            setErrors({})
             // Check form validation
-            const editTagValidator = tagSchema.pick({
+            const createTagValidator = tagSchema.pick({
                 name: true,
                 slug: true,
             })
-            await editTagValidator.parseAsync(formDataObj)
+            await createTagValidator.parseAsync(formDataObj)
             // Submit form
             await fetcher.submit(form)
             // Handle possible errors or close modal if success
@@ -51,22 +53,23 @@ export default function EditTagModal({ tag, isOpen, setOpen }) {
                 setErrors(z.flattenError(error).fieldErrors)
             }
 
-            const { details } = error
+            const { details } = error as {
+                details?: Record<string, string | string[]>
+            }
             if (details) {
                 setErrors(details)
             }
         }
     }
 
-    const onOpenChange = (isOpen) => {
+    const onOpenChange = (isOpen: boolean) => {
         if (isLoading) {
             return
         }
 
         if (!isOpen) {
-            setName(tag.name)
-            setSlug(tag.slug)
-            setErrors(null)
+            formRef.current?.reset()
+            setErrors({})
         }
         setOpen(isOpen)
     }
@@ -82,7 +85,7 @@ export default function EditTagModal({ tag, isOpen, setOpen }) {
                 {() => (
                     <>
                         <ModalHeader className="flex flex-col gap-1">
-                            Edit tag <span>{tag.name}</span>
+                            Create a new tag
                         </ModalHeader>
                         <ModalBody>
                             <Form
@@ -91,14 +94,8 @@ export default function EditTagModal({ tag, isOpen, setOpen }) {
                                 onSubmit={onSubmit}
                                 validationErrors={errors}
                                 action="/tags"
-                                method="put"
+                                method="post"
                             >
-                                <Input
-                                    type="hidden"
-                                    name="id"
-                                    isRequired
-                                    value={id}
-                                />
                                 <Input
                                     type="text"
                                     name="name"
@@ -106,8 +103,6 @@ export default function EditTagModal({ tag, isOpen, setOpen }) {
                                     isRequired
                                     labelPlacement="outside-top"
                                     isDisabled={isLoading}
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
                                 />
                                 <Input
                                     type="text"
@@ -116,8 +111,6 @@ export default function EditTagModal({ tag, isOpen, setOpen }) {
                                     isRequired
                                     labelPlacement="outside-top"
                                     isDisabled={isLoading}
-                                    value={slug}
-                                    onChange={(e) => setSlug(e.target.value)}
                                     errorMessage={({ validationErrors }) => (
                                         <ul>
                                             {validationErrors.map(
@@ -145,7 +138,7 @@ export default function EditTagModal({ tag, isOpen, setOpen }) {
                                 form={formId}
                                 isLoading={isLoading}
                             >
-                                Edit
+                                Create
                             </Button>
                         </ModalFooter>
                     </>

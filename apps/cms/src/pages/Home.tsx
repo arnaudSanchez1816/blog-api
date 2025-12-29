@@ -9,7 +9,11 @@ import useAuth from "@repo/auth-provider/useAuth"
 
 const NB_RECENT_POSTS = 3
 
-function RecentPosts({ token }) {
+interface RecentPostsProps {
+    token: string
+}
+
+function RecentPosts({ token }: RecentPostsProps) {
     const fetchRecentPostsQuery = useCallback(
         () =>
             fetchUserPosts(
@@ -32,7 +36,7 @@ function RecentPosts({ token }) {
         return <Alert color="danger" title="Failed to fetch recent posts." />
     }
 
-    const { results: recentPosts } = data
+    const { results: recentPosts } = data!
 
     return <PostsList posts={recentPosts} />
 }
@@ -44,7 +48,7 @@ export default function Home() {
             <div className="text-2xl">
                 <h1>
                     Welcome
-                    <div className="mt-2 font-bold">{user.name}</div>
+                    <div className="mt-2 font-bold">{user!.name}</div>
                 </h1>
             </div>
             <div className="mt-4 flex flex-col gap-2">
@@ -54,7 +58,7 @@ export default function Home() {
             <div className="mt-8">
                 <h2 className="text-2xl font-medium">My recent articles</h2>
                 <div className="mt-4">
-                    <RecentPosts token={accessToken} />
+                    <RecentPosts token={accessToken!} />
                 </div>
             </div>
         </div>

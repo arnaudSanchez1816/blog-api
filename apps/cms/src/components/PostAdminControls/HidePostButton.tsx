@@ -1,8 +1,17 @@
 import EyeIcon from "@repo/ui/components/Icons/EyeIcon"
 import { Button } from "@heroui/react"
 import { HIDE_INTENT } from "../../actions/posts"
+import { FetcherWithComponents } from "react-router"
 
-export default function HidePostButton({ postId, fetcher }) {
+export interface HidePostButtonProps {
+    postId: number
+    fetcher: FetcherWithComponents<unknown>
+}
+
+export default function HidePostButton({
+    postId,
+    fetcher,
+}: HidePostButtonProps) {
     const busy = fetcher.state !== "idle"
     const intent = fetcher.formData?.get("intent") || null
     const isBusyButton = intent === HIDE_INTENT

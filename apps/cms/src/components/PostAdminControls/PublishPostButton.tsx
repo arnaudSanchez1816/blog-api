@@ -1,8 +1,17 @@
 import EyeIcon from "@repo/ui/components/Icons/EyeIcon"
 import { Button } from "@heroui/react"
 import { PUBLISH_INTENT } from "../../actions/posts"
+import { FetcherWithComponents } from "react-router"
 
-export default function PublishPostButton({ postId, fetcher }) {
+export interface PublishPostButtonProps {
+    postId: number
+    fetcher: FetcherWithComponents<unknown>
+}
+
+export default function PublishPostButton({
+    postId,
+    fetcher,
+}: PublishPostButtonProps) {
     const busy = fetcher.state !== "idle"
     const intent = fetcher.formData?.get("intent") || null
     const isBusyButton = intent === PUBLISH_INTENT

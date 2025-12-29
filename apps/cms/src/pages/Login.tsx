@@ -1,5 +1,5 @@
 import { Button, Form, Input } from "@heroui/react"
-import { useState } from "react"
+import { FormEvent, useState } from "react"
 import ThreeColumnLayout from "@repo/ui/components/layouts/ThreeColumnLayout"
 import { Navigate, useNavigate } from "react-router"
 import useAuth from "@repo/auth-provider/useAuth"
@@ -10,16 +10,18 @@ export default function Login() {
     const [password, setPassword] = useState("")
 
     const [isLoading, setIsLoading] = useState(false)
-    const [errors, setErrors] = useState(null)
+    const [errors, setErrors] = useState<Record<string, string | string[]>>({})
     const { user, login } = useAuth()
-    const onLoginSubmit = async (e) => {
+    const onLoginSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
         setIsLoading(true)
-        setErrors(null)
+        setErrors({})
         const { error } = await login({ email, password })
         setIsLoading(false)
-        setErrors(error)
+        if (error) {
+            setErrors({ error })
+        }
         setPassword("")
         if (!error) {
             await navigate("/")
@@ -64,7 +66,9 @@ export default function Login() {
                             value={password}
                             onChange={(e) => setPassword(e.currentTarget.value)}
                         />
-                        {errors && <p className="text-danger">{errors}</p>}
+                        {errors && errors.error && (
+                            <p className="text-danger">{errors.error}</p>
+                        )}
                         <Button
                             type="submit"
                             color="primary"

@@ -1,6 +1,6 @@
-export async function parseErrorResponse(errorResponse) {
+export async function parseErrorResponse(errorResponse: Response) {
     const { status, statusText } = errorResponse
-    let error = {}
+    let error: { errorMessage: string; status: number }
     if (errorResponse.body) {
         try {
             const errorBody = await errorResponse.json()
@@ -9,12 +9,11 @@ export async function parseErrorResponse(errorResponse) {
             if (parseError instanceof SyntaxError == false) {
                 console.error(parseError)
             }
-            error = { errorMessage: statusText }
+            error = { errorMessage: statusText, status }
         }
     } else {
-        error = { errorMessage: statusText }
+        error = { errorMessage: statusText, status }
     }
-    error.status = status
 
     return error
 }

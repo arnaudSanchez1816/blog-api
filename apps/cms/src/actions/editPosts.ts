@@ -1,9 +1,12 @@
-import { data, redirect } from "react-router"
+import { ActionFunctionArgs, data, redirect } from "react-router"
 import { parseErrorResponse } from "../utils/parseErrorResponse"
 import { addToast } from "@heroui/react"
 import { updatePost } from "@repo/client-api/posts"
 
-export async function editPostsActions({ request, params, accessToken }) {
+export async function editPostsActions(
+    { request, params }: ActionFunctionArgs,
+    accessToken: string
+) {
     const { method } = request
     const { postId } = params
 
@@ -12,13 +15,21 @@ export async function editPostsActions({ request, params, accessToken }) {
     }
 
     if (method.toUpperCase() === "PUT") {
-        return await updatePostAction(postId, request, accessToken)
+        if (!postId || isNaN(Number(postId))) {
+            throw new Error("Post id invalid")
+        }
+
+        return await updatePostAction(Number(postId), request, accessToken)
     }
 
     throw data({ message: "Invalid method" }, 400)
 }
 
-async function updatePostAction(id, request, accessToken) {
+async function updatePostAction(
+    id: number,
+    request: Request,
+    accessToken: string
+) {
     try {
         const updatedPostData = await request.json()
         await updatePost(id, updatedPostData, accessToken)

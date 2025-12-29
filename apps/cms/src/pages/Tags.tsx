@@ -1,7 +1,7 @@
 import { Await, useAsyncError, useLoaderData, useSubmit } from "react-router"
 import ThreeColumnLayout from "@repo/ui/components/layouts/ThreeColumnLayout"
-import { fetchTags } from "@repo/client-api/tags"
-import { Suspense } from "react"
+import { fetchTags, FetchTagsResult, TagDetails } from "@repo/client-api/tags"
+import { ReactNode, Suspense } from "react"
 import {
     Button,
     Dropdown,
@@ -17,11 +17,19 @@ import PlusIcon from "@repo/ui/components/Icons/PlusIcon"
 import NewTagModal from "../components/modals/NewTagModal"
 import EditTagModal from "../components/modals/EditTagModal"
 
-export function tagsLoader({ request }) {
+export interface TagsLoaderFuncReturnValue {
+    fetchTagsPromise: Promise<FetchTagsResult>
+}
+
+export function tagsLoader(): TagsLoaderFuncReturnValue {
     return { fetchTagsPromise: fetchTags() }
 }
 
-function Tag({ tag = { name: "Tag", slug: "tag" } }) {
+interface TagProps {
+    tag: TagDetails
+}
+
+function Tag({ tag }: TagProps) {
     const { id, name, slug } = tag
     const [modalIsOpen, setModalIsOpen] = useState(false)
 
@@ -35,12 +43,7 @@ function Tag({ tag = { name: "Tag", slug: "tag" } }) {
         <>
             <Dropdown>
                 <DropdownTrigger>
-                    <Button
-                        radius="md"
-                        color="secondary"
-                        className="h-16"
-                        onpre
-                    >
+                    <Button radius="md" color="secondary" className="h-16">
                         <div className="flex h-full flex-col justify-center">
                             <div className="text-medium font-medium">
                                 {name}
@@ -101,7 +104,11 @@ function NewTagButton() {
     )
 }
 
-function TagsListSkeleton({ nbItems }) {
+interface TagsListSkeletonProps {
+    nbItems: number
+}
+
+function TagsListSkeleton({ nbItems }: TagsListSkeletonProps) {
     const skeletonTags = []
     for (let i = 0; i < nbItems; i++) {
         const skeletonTag = (
@@ -117,9 +124,26 @@ function TagsListSkeleton({ nbItems }) {
     return <div className="flex gap-4">{skeletonTags}</div>
 }
 
+type CustomError = { error: { errorMessage: string } }
+
+const isHandledError = (err: unknown): err is CustomError => {
+    if (!err) {
+        return false
+    }
+    if (Object.hasOwn(err, "error")) {
+        const { error } = err as { error: unknown }
+        if (Object.hasOwn(err, "errorMessage")) {
+            const { errorMessage } = error as { errorMessage: unknown }
+            return typeof errorMessage === "string"
+        }
+    }
+
+    return false
+}
+
 function TagsListErrorElement() {
     const error = useAsyncError()
-    if (error?.error) {
+    if (isHandledError(error)) {
         const { errorMessage } = error.error
         return (
             <div className="text-danger">
@@ -134,7 +158,7 @@ function TagsListErrorElement() {
 
 const NB_SKELETON_TAGS = 5
 function TagsList() {
-    const { fetchTagsPromise } = useLoaderData()
+    const { fetchTagsPromise } = useLoaderData<TagsLoaderFuncReturnValue>()
 
     return (
         <div>
@@ -162,7 +186,11 @@ function TagsList() {
     )
 }
 
-function TagsLayout({ children }) {
+interface TagsLayoutProps {
+    children: ReactNode
+}
+
+function TagsLayout({ children }: TagsLayoutProps) {
     return <ThreeColumnLayout center={children} />
 }
 

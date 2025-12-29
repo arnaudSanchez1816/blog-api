@@ -1,9 +1,14 @@
-import { fetchPost } from "@repo/client-api/posts"
+import { fetchPost, PostDetails } from "@repo/client-api/posts"
 import { postSchema } from "@repo/zod-schemas"
-import { useBlocker, useFetcher, useLoaderData } from "react-router"
-import { useCallback, useEffect, useState } from "react"
+import {
+    LoaderFunctionArgs,
+    useBlocker,
+    useFetcher,
+    useLoaderData,
+} from "react-router"
+import { ReactNode, useCallback, useEffect, useState } from "react"
 import { addToast, Button, Divider } from "@heroui/react"
-import { fetchTags } from "@repo/client-api/tags"
+import { fetchTags, TagDetails } from "@repo/client-api/tags"
 import _ from "lodash"
 import EditablePostTitle from "../components/EditablePostTitle"
 import EditTagsSection from "../components/EditTagsSection"
@@ -13,7 +18,15 @@ import SaveIcon from "@repo/ui/components/Icons/SaveIcon"
 import z from "zod"
 import Confirm from "../components/modals/Confirm"
 
-export async function editPostLoader({ params }, accessToken) {
+interface EditPostLoaderReturnValue {
+    post: PostDetails
+    allTags: TagDetails[]
+}
+
+export async function editPostLoader(
+    { params }: LoaderFunctionArgs,
+    accessToken: string | null
+): Promise<EditPostLoaderReturnValue> {
     const postIdSchema = postSchema.pick({ id: true })
     const { id } = await postIdSchema.parseAsync({ id: params.postId })
 
@@ -24,17 +37,23 @@ export async function editPostLoader({ params }, accessToken) {
     return { post, allTags: allTags.results }
 }
 
-function EditPostLayout({ children, left, right }) {
+interface EditPostLayoutProps {
+    children?: ReactNode
+    left?: ReactNode
+    right?: ReactNode
+}
+
+function EditPostLayout({ children, left, right }: EditPostLayoutProps) {
     return <ThreeColumnLayout left={left} right={right} center={children} />
 }
 
 export default function EditPost() {
-    const { post } = useLoaderData()
+    const { post, allTags } = useLoaderData<EditPostLoaderReturnValue>()
     const { id, title, body, tags } = post
-    const [newTitle, setNewTitle] = useState(title)
-    const [newBody, setNewBody] = useState(body)
-    const [newTags, setNewTags] = useState(tags)
-    const [isDirty, setIsDirty] = useState(false)
+    const [newTitle, setNewTitle] = useState<string>(title)
+    const [newBody, setNewBody] = useState<string>(body)
+    const [newTags, setNewTags] = useState<TagDetails[]>(tags)
+    const [isDirty, setIsDirty] = useState<boolean>(false)
     const blocker = useBlocker(useCallback(() => isDirty, [isDirty]))
     const fetcher = useFetcher()
 
@@ -133,6 +152,7 @@ export default function EditPost() {
                 />
                 <div className="mt-4">
                     <EditTagsSection
+                        allTags={allTags}
                         newTags={newTags}
                         setNewTags={setNewTags}
                     />

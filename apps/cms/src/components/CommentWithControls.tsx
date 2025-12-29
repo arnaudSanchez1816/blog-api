@@ -6,12 +6,21 @@ import {
     DropdownMenu,
     DropdownTrigger,
 } from "@heroui/react"
+import { CommentDetails } from "@repo/client-api/comments"
 import DeleteIcon from "@repo/ui/components/Icons/DeleteIcon"
 import EditIcon from "@repo/ui/components/Icons/EditIcon"
 import { format } from "date-fns"
 import { useFetcher } from "react-router"
 
-export default function CommentWithControls({ comment, refreshComments }) {
+export interface CommentWithControlsProps {
+    comment: CommentDetails
+    refreshComments: () => void
+}
+
+export default function CommentWithControls({
+    comment,
+    refreshComments,
+}: CommentWithControlsProps) {
     const { id, username, body, createdAt } = comment
     const fetcher = useFetcher({ key: "comments" })
 
@@ -59,6 +68,7 @@ export default function CommentWithControls({ comment, refreshComments }) {
                     </DropdownTrigger>
                     <DropdownMenu>
                         <DropdownItem
+                            key="delete"
                             startContent={<DeleteIcon />}
                             color="danger"
                             className="text-danger"

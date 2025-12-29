@@ -1,14 +1,22 @@
 import useAuth from "@repo/auth-provider/useAuth"
 import { Navigate, Outlet, redirect } from "react-router"
 
-export function authLoader(user) {
+export function authLoader(user: { id: number } | null) {
     const isAuthenticated = !!user
     if (!isAuthenticated) {
         throw redirect("/login")
     }
 }
 
-export default function ProtectedRoute({ redirect = "/", replace }) {
+export interface ProtectedRouteProps {
+    redirect?: string
+    replace?: boolean
+}
+
+export default function ProtectedRoute({
+    redirect = "/",
+    replace,
+}: ProtectedRouteProps) {
     const { user } = useAuth()
 
     if (!user) {

@@ -4,14 +4,26 @@ import EyeIcon from "@repo/ui/components/Icons/EyeIcon"
 import PostMarkdown from "@repo/ui/components/posts/PostMarkdown"
 import { useState } from "react"
 
-export default function EditPostContentSection({ newBody, setNewBody }) {
-    const [editMode, setEditMode] = useState("edit")
+export interface EditPostContentSectionProps {
+    newBody: string
+    setNewBody: (newBody: string) => void
+}
+
+type EditMode = "edit" | "preview"
+
+export default function EditPostContentSection({
+    newBody,
+    setNewBody,
+}: EditPostContentSectionProps) {
+    const [editMode, setEditMode] = useState<EditMode>("edit")
     return (
         <div className="relative mt-8">
             <Tabs
                 isVertical
                 fullWidth
-                onSelectionChange={setEditMode}
+                onSelectionChange={(key) =>
+                    setEditMode(key.toString() as EditMode)
+                }
                 selectedKey={editMode}
                 classNames={{
                     tabWrapper: "hidden xl:block absolute w-38 -left-54",

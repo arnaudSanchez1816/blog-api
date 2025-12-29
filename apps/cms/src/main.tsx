@@ -50,7 +50,7 @@ function Root() {
                                 element={
                                     <ProtectedRoute redirect="/login" replace />
                                 }
-                                loader={() => authLoader(user)}
+                                loader={() => authLoader(user)} // This should make sure that the access token/user infos are not null
                             >
                                 <Route
                                     element={<SearchLayout />}
@@ -59,10 +59,10 @@ function Root() {
                                     <Route index element={<Home />}></Route>
                                     <Route
                                         path="/posts"
-                                        action={({ request, params }) =>
+                                        action={(actionFuncArgs) =>
                                             postsAction(
-                                                { request, params },
-                                                accessToken
+                                                actionFuncArgs,
+                                                accessToken!
                                             )
                                         }
                                     >
@@ -76,16 +76,16 @@ function Root() {
                                         <Route
                                             path=":postId"
                                             element={<Post />}
-                                            loader={({ params }) =>
+                                            loader={(loaderArgs) =>
                                                 postLoader(
-                                                    { params },
-                                                    accessToken
+                                                    loaderArgs,
+                                                    accessToken!
                                                 )
                                             }
-                                            action={({ params, request }) =>
+                                            action={(loaderArgs) =>
                                                 postsAction(
-                                                    { params, request },
-                                                    accessToken
+                                                    loaderArgs,
+                                                    accessToken!
                                                 )
                                             }
                                         />
@@ -94,8 +94,11 @@ function Root() {
                                         path="/tags"
                                         element={<Tags />}
                                         loader={tagsLoader}
-                                        action={({ request }) =>
-                                            tagsAction({ request }, accessToken)
+                                        action={(actionFuncArgs) =>
+                                            tagsAction(
+                                                actionFuncArgs,
+                                                accessToken!
+                                            )
                                         }
                                     ></Route>
                                     <Route
@@ -110,14 +113,17 @@ function Root() {
                                 <Route
                                     path="/posts/:postId/edit"
                                     element={<EditPost />}
-                                    loader={({ params }) =>
-                                        editPostLoader({ params }, accessToken)
+                                    loader={(actionFuncArgs) =>
+                                        editPostLoader(
+                                            actionFuncArgs,
+                                            accessToken!
+                                        )
                                     }
                                     action={(actionsArgs) =>
-                                        editPostsActions({
-                                            ...actionsArgs,
-                                            accessToken,
-                                        })
+                                        editPostsActions(
+                                            actionsArgs,
+                                            accessToken!
+                                        )
                                     }
                                 />
                             </Route>
@@ -126,7 +132,7 @@ function Root() {
                             <Route
                                 path="/comments/:id"
                                 action={(actionArgs) =>
-                                    commentsAction(actionArgs, accessToken)
+                                    commentsAction(actionArgs, accessToken!)
                                 }
                             ></Route>
                             <Route

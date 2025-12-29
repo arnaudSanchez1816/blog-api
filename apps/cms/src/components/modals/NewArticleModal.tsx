@@ -8,20 +8,30 @@ import {
     ModalFooter,
     ModalHeader,
 } from "@heroui/react"
-import { useId, useRef, useState } from "react"
+import { FormEvent, useId, useRef, useState } from "react"
 import { z } from "zod"
 import { postSchema } from "@repo/zod-schemas"
 import { useNavigation, useSubmit } from "react-router"
 
-export default function NewArticleModal({ isOpen, onClose, onOpenChange }) {
+export interface NewArticleModalProps {
+    isOpen: boolean
+    onClose: () => void
+    onOpenChange: (isOpen: boolean) => void
+}
+
+export default function NewArticleModal({
+    isOpen,
+    onClose,
+    onOpenChange,
+}: NewArticleModalProps) {
     const formId = useId()
-    const [errors, setErrors] = useState(null)
-    const formRef = useRef(null)
+    const [errors, setErrors] = useState<Record<string, string | string[]>>({})
+    const formRef = useRef<HTMLFormElement>(null)
     const submit = useSubmit()
     const navigation = useNavigation()
     const isLoading = navigation.formAction === "/posts"
 
-    const onSubmit = async (e) => {
+    const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         const form = e.currentTarget
 
@@ -38,13 +48,13 @@ export default function NewArticleModal({ isOpen, onClose, onOpenChange }) {
         }
     }
 
-    const onOpenChangeWrapper = (isOpen) => {
+    const onOpenChangeWrapper = (isOpen: boolean) => {
         if (isLoading) {
             return
         }
 
         if (isOpen) {
-            formRef.current.reset()
+            formRef.current?.reset()
         }
         onOpenChange(isOpen)
     }

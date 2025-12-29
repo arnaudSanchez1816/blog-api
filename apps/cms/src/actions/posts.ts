@@ -1,32 +1,39 @@
 import { addToast } from "@heroui/react"
 import { deletePost, hidePost, publishPost } from "@repo/client-api/posts"
-import { data, redirect } from "react-router"
+import { ActionFunctionArgs, data, redirect } from "react-router"
 import { parseErrorResponse } from "../utils/parseErrorResponse"
 
 export const DELETE_INTENT = "delete"
 export const PUBLISH_INTENT = "publish"
 export const HIDE_INTENT = "hide"
 
-export async function postsAction({ request, params = {} }, accessToken) {
+export async function postsAction(
+    { request, params }: ActionFunctionArgs,
+    accessToken: string
+) {
     const { method } = request
     const { postId } = params
 
     const formData = await request.formData()
     if (method === "POST" && !postId) {
-        return await createNewPost({ formData, accessToken })
+        return await createNewPost(formData, accessToken)
     }
 
     if (postId) {
         const intent = formData.get("intent")
         const { postId } = params
 
+        if (!postId || isNaN(Number(postId))) {
+            throw new Error("Invalid post id")
+        }
+
         switch (intent) {
             case DELETE_INTENT:
-                return await deletePostAction({ accessToken, postId })
+                return await deletePostAction(+postId, accessToken)
             case PUBLISH_INTENT:
-                return await publishPostAction({ accessToken, postId })
+                return await publishPostAction(+postId, accessToken)
             case HIDE_INTENT:
-                return await hidePostAction({ accessToken, postId })
+                return await hidePostAction(+postId, accessToken)
             default:
                 throw data({ message: "Invalid intent" }, 400)
         }
@@ -35,7 +42,7 @@ export async function postsAction({ request, params = {} }, accessToken) {
     throw data({ message: "Invalid action" }, 400)
 }
 
-async function createNewPost({ formData, accessToken }) {
+async function createNewPost(formData: FormData, accessToken: string) {
     try {
         const title = formData.get("title")
 
@@ -76,7 +83,7 @@ async function createNewPost({ formData, accessToken }) {
     }
 }
 
-async function deletePostAction({ postId, accessToken }) {
+async function deletePostAction(postId: number, accessToken: string) {
     try {
         await deletePost(postId, accessToken)
         addToast({
@@ -100,7 +107,7 @@ async function deletePostAction({ postId, accessToken }) {
     }
 }
 
-async function publishPostAction({ postId, accessToken }) {
+async function publishPostAction(postId: number, accessToken: string) {
     try {
         await publishPost(postId, accessToken)
         addToast({
@@ -123,7 +130,7 @@ async function publishPostAction({ postId, accessToken }) {
     }
 }
 
-async function hidePostAction({ postId, accessToken }) {
+async function hidePostAction(postId: number, accessToken: string) {
     try {
         await hidePost(postId, accessToken)
         addToast({

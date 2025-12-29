@@ -1,9 +1,12 @@
 import { addToast } from "@heroui/react"
 import { createTag, deleteTag, editTag } from "@repo/client-api/tags"
-import { data } from "react-router"
+import { ActionFunctionArgs, data } from "react-router"
 import { parseErrorResponse } from "../utils/parseErrorResponse"
 
-export async function tagsAction({ request }, accessToken) {
+export async function tagsAction(
+    { request }: ActionFunctionArgs,
+    accessToken: string
+) {
     const { method } = request
 
     const formData = await request.formData()
@@ -18,21 +21,30 @@ export async function tagsAction({ request }, accessToken) {
     }
 
     if (method.toUpperCase() === "DELETE") {
-        return await deleteTagAction(tagId, accessToken)
+        return await deleteTagAction(tagId.toString(), accessToken)
     }
 
     if (method.toUpperCase() === "PUT") {
-        return await editTagAction(tagId, formData, accessToken)
+        return await editTagAction(tagId.toString(), formData, accessToken)
     }
 
     throw data({ message: "Invalid action" }, 400)
 }
 
-async function createTagAction(formData, accessToken) {
+async function createTagAction(formData: FormData, accessToken: string) {
     try {
         const name = formData.get("name")
+        if (!name) {
+            throw new Error("Create tag missing name parameter")
+        }
         const slug = formData.get("slug")
-        const createdTag = await createTag({ name, slug }, accessToken)
+        if (!slug) {
+            throw new Error("Create tag missing slug parameter")
+        }
+        const createdTag = await createTag(
+            { name: name.toString(), slug: slug.toString() },
+            accessToken
+        )
 
         addToast({
             title: "Tag created",
@@ -57,11 +69,25 @@ async function createTagAction(formData, accessToken) {
     }
 }
 
-async function editTagAction(tagId, formData, accessToken) {
+async function editTagAction(
+    tagId: number | string,
+    formData: FormData,
+    accessToken: string
+) {
     try {
         const name = formData.get("name")
+        if (!name) {
+            throw new Error("Edit Tag Action name param missing")
+        }
         const slug = formData.get("slug")
-        const editedTag = await editTag({ name, slug }, tagId, accessToken)
+        if (!slug) {
+            throw new Error("Edit Tag Action slug param missing")
+        }
+        const editedTag = await editTag(
+            { name: name.toString(), slug: slug.toString() },
+            tagId,
+            accessToken
+        )
         addToast({
             title: "Tag edited",
             description: `${editedTag.name}`,
@@ -86,7 +112,7 @@ async function editTagAction(tagId, formData, accessToken) {
     }
 }
 
-async function deleteTagAction(tagId, accessToken) {
+async function deleteTagAction(tagId: number | string, accessToken: string) {
     try {
         const deletedTag = await deleteTag(tagId, accessToken)
         addToast({
@@ -94,6 +120,8 @@ async function deleteTagAction(tagId, accessToken) {
             description: `${deletedTag.name}`,
             color: "success",
         })
+
+        return deletedTag
     } catch (error) {
         if (error instanceof Response) {
             const errorResponse = await parseErrorResponse(error)

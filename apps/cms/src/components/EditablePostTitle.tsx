@@ -1,9 +1,17 @@
-import { Button, Input, Textarea } from "@heroui/react"
+import { Button, Textarea } from "@heroui/react"
 import { useEffect, useRef, useState } from "react"
 
-export default function EditablePostTitle({ newTitle, setNewTitle }) {
-    const [isEditing, setIsEditing] = useState(false)
-    const inputRef = useRef(null)
+export interface EditablePostTitleProps {
+    newTitle: string
+    setNewTitle: (newTitle: string) => void
+}
+
+export default function EditablePostTitle({
+    newTitle,
+    setNewTitle,
+}: EditablePostTitleProps) {
+    const [isEditing, setIsEditing] = useState<boolean>(false)
+    const inputRef = useRef<HTMLTextAreaElement | null>(null)
 
     useEffect(() => {
         if (isEditing && inputRef.current) {

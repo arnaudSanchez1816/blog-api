@@ -1,7 +1,16 @@
 import { Button, Link } from "@heroui/react"
 import EditIcon from "@repo/ui/components/Icons/EditIcon"
+import { FetcherWithComponents } from "react-router"
 
-export default function EditPostButton({ postId, fetcher }) {
+export interface EditPostButtonProps {
+    postId: number
+    fetcher: FetcherWithComponents<unknown>
+}
+
+export default function EditPostButton({
+    postId,
+    fetcher,
+}: EditPostButtonProps) {
     const busy = fetcher.state !== "idle"
 
     return (

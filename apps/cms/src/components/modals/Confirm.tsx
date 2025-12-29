@@ -1,6 +1,16 @@
 import { useEffect } from "react"
 
-export default function Confirm({ message, onConfirm, onCancel }) {
+export interface ConfirmProps {
+    message: string
+    onConfirm: () => void
+    onCancel: () => void
+}
+
+export default function Confirm({
+    message,
+    onConfirm,
+    onCancel,
+}: ConfirmProps) {
     useEffect(() => {
         let ignore = false
         const confirmed = confirm(message)
@@ -14,6 +24,10 @@ export default function Confirm({ message, onConfirm, onCancel }) {
             onCancel()
         }
 
-        return () => (ignore = true)
+        return () => {
+            ignore = true
+        }
     }, [message, onCancel, onConfirm])
+
+    return <></>
 }

@@ -1,9 +1,14 @@
 import { Autocomplete, AutocompleteItem, Chip } from "@heroui/react"
+import { TagDetails } from "@repo/client-api/tags"
 import _ from "lodash"
-import { useRef } from "react"
-import { useLoaderData } from "react-router"
+import { Key, useRef } from "react"
 
-function Tag({ tag, onDeleteTag }) {
+interface TagProps {
+    tag: TagDetails
+    onDeleteTag: (tag: TagDetails) => void
+}
+
+function Tag({ tag, onDeleteTag }: TagProps) {
     const { name } = tag
 
     return (
@@ -13,9 +18,18 @@ function Tag({ tag, onDeleteTag }) {
     )
 }
 
-export default function EditTagsSection({ newTags, setNewTags }) {
-    const { allTags } = useLoaderData()
-    const tagInputRef = useRef(null)
+export interface EditTagsSectionProps {
+    allTags: TagDetails[]
+    newTags: TagDetails[]
+    setNewTags: (newTags: TagDetails[]) => void
+}
+
+export default function EditTagsSection({
+    allTags,
+    newTags,
+    setNewTags,
+}: EditTagsSectionProps) {
+    const tagInputRef = useRef<HTMLInputElement | null>(null)
 
     const availableTags = _.differenceWith(
         allTags,
@@ -23,7 +37,7 @@ export default function EditTagsSection({ newTags, setNewTags }) {
         (tag1, tag2) => tag1.id === tag2.id
     )
 
-    const onTagSelected = (tagId) => {
+    const onTagSelected = (tagId: Key | null) => {
         if (tagId) {
             const newTag = allTags.find((t) => t.id === Number(tagId))
             if (!newTag) {
@@ -35,7 +49,7 @@ export default function EditTagsSection({ newTags, setNewTags }) {
         }
     }
 
-    const onTagDeleted = ({ id }) => {
+    const onTagDeleted = ({ id }: TagDetails) => {
         setNewTags(newTags.filter((t) => t.id !== id))
     }
 
